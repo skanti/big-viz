@@ -140,6 +140,7 @@ ws_handle.on('connection', socket => {
 
 	socket.on('data', data => {
     socket.broadcast.emit("data", data);
+    socket.emit("ok");
 	})
 })
 

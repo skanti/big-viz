@@ -141,7 +141,48 @@ export default class Viewer extends Vue {
     let material = new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide });
     let mesh = new THREE.Mesh( geometry, material );
     this.renderer.scene.add(mesh);
-    console.log(mesh);
+  }
+
+  add_points_to_scene(data) {
+    if (!("positions" in data))
+      throw Error("'points' not in data");
+    if (!("res" in data))
+      throw Error("'res' not in data");
+
+    const positions_buff = data["positions"];
+    const colors_buff = data["colors"];
+    const res = data["res"];
+
+    let color = null;
+    let color_buff =  data["color"];
+    if (color_buff) {
+      if (color_buff.length != 3)
+        throw Error("'color' element has to size=3");
+      color = new THREE.Color(color_buff[0], color_buff[1], color_buff[2]);
+    }
+
+    if (!colors_buff && !color_buff)
+      color = new THREE.Color(Math.random(), Math.random(), Math.random());
+
+    const geometry = new THREE.BoxBufferGeometry(res, res, res);
+    const material = new THREE.MeshLambertMaterial( { color: color });
+    const n_positions = positions_buff.length;
+    let mesh = new THREE.InstancedMesh( geometry, material, n_positions );
+    for (let i = 0; i < n_positions; i++) {
+      const trans = new THREE.Vector3(positions_buff[i][0], positions_buff[i][1], positions_buff[i][2]);
+      const rot = new THREE.Quaternion();
+      const scale = new THREE.Vector3(1, 1, 1);
+      let trs = new THREE.Matrix4();
+      trs = trs.compose(trans, rot, scale);
+      mesh.setMatrixAt(i, trs);
+      if (colors_buff) {
+        const c = new THREE.Color(colors_buff[i][0], colors_buff[i][1], colors_buff[i][2]);
+        mesh.setColorAt(i, c);
+      }
+    }
+    console.log(n_positions, res, color);
+
+    this.renderer.scene.add(mesh);
   }
 
   onclick_mouse(event) {
@@ -164,7 +205,7 @@ export default class Viewer extends Vue {
     data = JSON.parse(data);
     let type = data["type"];
 
-		let accepted_types = new Set(["ply"]);
+		let accepted_types = new Set(["ply", "points"]);
     if (!accepted_types.has(type)) {
       console.log("Warning: Received data has unknown type. Type: ", type);
       return
@@ -173,6 +214,8 @@ export default class Viewer extends Vue {
     try {
       if (type === "ply")
         this.add_ply_to_scene(data);
+      else if (type === "points")
+        this.add_points_to_scene(data);
     } catch (err){
       console.log(err);
     }
