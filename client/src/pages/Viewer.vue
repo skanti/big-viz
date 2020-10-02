@@ -1,0 +1,54 @@
+<template>
+  <q-page>
+
+    <div v-if="mode==='loading'" class="q-gutter-md fixed-center text-center">
+      <q-spinner-grid color="primary" size="xl">  </q-spinner-grid>
+      <div>
+        <q-badge> {{this.mode_msg}} </q-badge>
+      </div>
+    </div>
+
+    <div v-if="mode==='error'" class="q-gutter-md fixed-center text-center">
+      <i class="text-negative fas fa-exclamation-triangle" style="font-size:3rem"></i>
+      <div>
+        <q-badge color="negative"> {{this.mode_msg}} </q-badge>
+      </div>
+    </div>
+
+    <div class="row q-pa-sm" id="div_menu_bar">
+      <div class="row items-center q-col-gutter-md" style="width:100%">
+        <div class="col-11">
+          <q-input class="q-pa-none"  v-model="text" label="File Path" rounded standout bottom-slots>
+            <template v-slot:prepend> <q-icon name="fas fa-file" /> </template>
+            <template v-slot:append> <q-icon name="fas fa-times" @click="text = ''" class="cursor-pointer" /> </template>
+          </q-input>
+        </div>
+        <div class="col-1">
+          <q-btn @click="onclick_grab" label="Grab" class="text-bold fit" color="primary" icon="fas fa-arrow-circle-right" >  </q-btn>
+        </div>
+      </div>
+    </div>
+
+    <div class="row q-col-gutter-sm q-pa-sm">
+      <div class="col-9">
+        <q-chip class="q-ma-none q-my-sm" color="accent" text-color="white" icon="fas fa-cube" square> Canvas </q-chip>
+        <div ref="div_scene" style="width:100%;height:50vh"> </div>
+      </div>
+      <div class="col-3">
+        <q-chip class="q-ma-none q-my-sm" color="accent" text-color="white" icon="fas fa-bars" square> Menu </q-chip>
+      </div>
+    </div>
+
+  </q-page>
+</template>
+
+<script>
+
+import Viewer  from '@/components/Viewer.js';
+
+export default Viewer;
+</script>
+
+<style scoped lang="scss">
+
+</style>
