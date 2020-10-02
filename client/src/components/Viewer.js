@@ -83,7 +83,7 @@ export default class Viewer extends Vue {
   }
 
   add_ground_plane_to_scene() {
-    let width = 20.0;
+    let width = 100.0;
     //let geometry = new THREE.PlaneBufferGeometry( width, width );
     //geometry.rotateX(-Math.PI/2);
     //let material = new THREE.ShadowMaterial( { opacity: 0.2 } );
@@ -140,8 +140,9 @@ export default class Viewer extends Vue {
 
     let material = new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide });
     let mesh = new THREE.Mesh( geometry, material );
-    this.renderer.scene.add(mesh);
+    this.upsert_mesh(data["id"], mesh);
   }
+
 
   add_points_to_scene(data) {
     if (!("positions" in data))
@@ -180,9 +181,24 @@ export default class Viewer extends Vue {
         mesh.setColorAt(i, c);
       }
     }
-    console.log(n_positions, res, color);
 
+
+    this.upsert_mesh(data["id"], mesh);
+  }
+
+  upsert_mesh(id, mesh) {
+
+    for (let [i,v] of Object.entries(this.renderer.scene.children)) {
+      const is_match = v["name"] === id;
+      console.log("name", v["name"]);
+      if (is_match) {
+        this.renderer.scene.remove(v);
+        break;
+      }
+    }
+    mesh.name = id;
     this.renderer.scene.add(mesh);
+
   }
 
   onclick_mouse(event) {
