@@ -118,6 +118,6 @@ handle.listen({"port" : port, "host" : hostname}, () => {
 let ws_handle = new ws.Server({port: process.env.PORT_WEBSOCKET, 'Access-Control-Allow-Origin': "*"});
 ws_handle.on('connection', ws => {
   ws.on('message', msg => {
-    console.log(`Received message => ${msg}`)
+    console.log(`Received message: ${msg}`)
   })
 });

@@ -14,11 +14,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    scene : null,
     socket: {
       isConnected: false,
       message: '',
       reconnectError: false,
-      scene : null,
     }
   },
   mutations: {

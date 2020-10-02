@@ -6,11 +6,12 @@ import * as THREE from "three";
 import { mapState } from 'vuex'
 
 
+import Menu  from '@/components/Menu.vue';
 import Renderer from '@/components/Renderer.js';
 
 @Component({
   name: "Viewer",
-  components: { },
+  components: { Menu },
   computed: mapState([ "scene" ])
 })
 export default class Viewer extends Vue {
@@ -42,8 +43,8 @@ export default class Viewer extends Vue {
     // <-
 
     // -> trigger
-    this.add_bbox_to_scene();
     this.add_ground_plane_to_scene();
+    this.$store.commit("scene", this.renderer.scene);
     // <-
 
     this.mode = "ok";
@@ -53,7 +54,6 @@ export default class Viewer extends Vue {
     this.advance_ref = this.advance.bind(this);
     this.advance();
     // <-
-    console.log(this.renderer.scene);
   }
 
   mounted() {
@@ -110,9 +110,8 @@ export default class Viewer extends Vue {
   }
 
   onclick_grab() {
-    this.$socket.send('some data')
-
-    console.log(this.text);
+    this.add_bbox_to_scene();
+    this.ctx.event_bus.$emit("new_object");
   }
 
   raycast() {

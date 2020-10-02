@@ -31,11 +31,12 @@
 
     <div class="row q-col-gutter-sm q-pa-sm">
       <div class="col-9">
-        <q-chip class="q-ma-none q-my-sm" color="accent" text-color="white" icon="fas fa-cube" square> Canvas </q-chip>
+        <q-chip class="q-ma-none q-my-sm" color="primary" text-color="white" icon="fas fa-cube" square> Canvas </q-chip>
         <div ref="div_scene" style="width:100%;height:50vh"> </div>
       </div>
       <div class="col-3">
-        <q-chip class="q-ma-none q-my-sm" color="accent" text-color="white" icon="fas fa-bars" square> Menu </q-chip>
+        <q-chip class="q-ma-none q-my-sm" color="primary" text-color="white" icon="fas fa-bars" square> Menu </q-chip>
+        <Menu ref="menu" class="full-width" :ctx="ctx"/>
       </div>
     </div>
 
