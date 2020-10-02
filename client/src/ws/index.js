@@ -1,32 +1,8 @@
+import io from 'socket.io-client';
 
-import store from '@/store'
+//const options = {};
 
-// index.js
-import {
-  SOCKET_ONOPEN,
-  SOCKET_ONCLOSE,
-  SOCKET_ONERROR,
-  SOCKET_ONMESSAGE,
-  SOCKET_RECONNECT,
-  SOCKET_RECONNECT_ERROR
-} from '@/ws/mutation-types.js'
- 
-const mutations = {
-  SOCKET_ONOPEN,
-  SOCKET_ONCLOSE,
-  SOCKET_ONERROR,
-  SOCKET_ONMESSAGE,
-  SOCKET_RECONNECT,
-  SOCKET_RECONNECT_ERROR
-}
-
-
-const ws = { 
-  store: store,
-  format: 'json',
-  reconnection: false,
-  reconnectionAttempts: 5,
-  mutations: mutations
-};
+let uri_ws = 'http://localhost:' + process.env.VUE_APP_PORT_WEBSOCKET;
+const ws = io(uri_ws);
 
 export default ws;

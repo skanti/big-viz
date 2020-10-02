@@ -40,11 +40,17 @@ export default class Viewer extends Vue {
 
     // -> set listeners
     this.ctx.event_bus.$on("onclick_mouse_renderer", this.onclick_mouse.bind(this));
+    this.ctx.event_bus.$on("onclick_mouse_renderer", this.onclick_mouse.bind(this));
     // <-
 
     // -> trigger
     this.add_ground_plane_to_scene();
     this.$store.commit("scene", this.renderer.scene);
+    // <-
+
+    // -> add listener
+    this.$socket.$subscribe('user', id_socket => console.log("id_socket", id_socket));
+    this.$socket.$subscribe('data', this.on_ws_data.bind(this));
     // <-
 
     this.mode = "ok";
@@ -93,6 +99,51 @@ export default class Viewer extends Vue {
     this.renderer.scene.add( helper );
   }
 
+  add_ply_to_scene(data) {
+    if (!("verts" in data))
+      throw Error("No 'verts' in data");
+    if (!("faces" in data))
+      throw Error("No 'faces' in data");
+
+    const verts_buff = data["verts"];
+    const faces_buff = data["faces"];
+    const colors_buff = data["colors"];
+
+    let geometry = new THREE.Geometry();
+
+    /*eslint no-unused-vars: "off"*/
+    for (let [i,v] of Object.entries(verts_buff)) {
+      geometry.vertices.push(new THREE.Vector3(v[0], v[1], v[2]));
+    }
+    for (let [i,f] of Object.entries(faces_buff)) {
+      geometry.faces.push(new THREE.Face3(f[0], f[1], f[2]));
+    }
+
+    geometry.computeVertexNormals();
+
+    if (colors_buff) {
+      for (let [i,c] of Object.entries(colors_buff)) {
+        geometry.colors.push(new THREE.Vector3(c[0], c[1], c[2]));
+      }
+    }
+
+    let color = null;
+    let color_buff =  data["color"];
+    if (color_buff) {
+      if (color_buff.length != 3)
+        throw Error("'color' element has to size=3");
+      color = new THREE.Color(color_buff[0], color_buff[1], color_buff[2]);
+    }
+
+    if (!colors_buff && !color_buff)
+      color = new THREE.Color(Math.random(), Math.random(), Math.random());
+
+    let material = new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide });
+    let mesh = new THREE.Mesh( geometry, material );
+    this.renderer.scene.add(mesh);
+    console.log(mesh);
+  }
+
   onclick_mouse(event) {
     this.onclick_instance(event);
   }
@@ -108,6 +159,25 @@ export default class Viewer extends Vue {
       this.ctx.event_bus.$emit("instance_selected", this.id_raycast);
     }
   }
+
+  on_ws_data(data) {
+    data = JSON.parse(data);
+    let type = data["type"];
+
+		let accepted_types = new Set(["ply"]);
+    if (!accepted_types.has(type)) {
+      console.log("Warning: Received data has unknown type. Type: ", type);
+      return
+    }
+
+    try {
+      if (type === "ply")
+        this.add_ply_to_scene(data);
+    } catch (err){
+      console.log(err);
+    }
+  }
+
 
   onclick_grab() {
     this.add_bbox_to_scene();
