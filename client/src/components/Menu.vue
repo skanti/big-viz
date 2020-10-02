@@ -2,12 +2,13 @@
 
   <div >
     <q-table
-      title="Treats"
+      title="Objects"
       :data="rows"
       :columns="columns"
-      row-key="name"
+      row-key="id"
       selection="multiple"
       :selected.sync="selected"
+      @selection="toggle_visibility"
       >
       <template v-slot:top-left>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
@@ -64,6 +65,8 @@ export default {
       let name_mapping = {};
       for (let [i,obj] of Object.entries(this.scene.children)) {
         let type = obj.type;
+        if (type.includes("Light"))
+          continue
         if (name_mapping[type] == undefined)
           name_mapping[type] = 0
         else
@@ -82,6 +85,13 @@ export default {
   }, methods : { 
     add_new_object: function () {
       console.log(this.scene);
+    },
+    toggle_visibility: function(r) {
+      /*eslint no-unused-vars: "off"*/
+      for (let [i,k] of Object.entries(r.rows)) {
+        let idx = k.idx;
+        this.scene.children[idx].visible = !this.scene.children[idx].visible;
+      }
     }
   } 
 }
