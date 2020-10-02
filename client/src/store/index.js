@@ -1,59 +1,51 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import {
+  SOCKET_ONOPEN,
+  SOCKET_ONCLOSE,
+  SOCKET_ONERROR,
+  SOCKET_ONMESSAGE,
+  SOCKET_RECONNECT,
+  SOCKET_RECONNECT_ERROR
+} from '@/ws//mutation-types.js'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    id_sequence: '',
-    id_frame: '',
-    id_selected_cad: '',
-    id_selected_instance: '',
-    duration_retrieval: 0,
-    user: {},
-    mesh_lidar: null,
-    meshes_cad: [],
-    annotations: [],
-    camera: null,
-    controls: null,
+    socket: {
+      isConnected: false,
+      message: '',
+      reconnectError: false,
+      scene : null,
+    }
   },
   mutations: {
-    user(state, user) {
-      state.user = user
+    [SOCKET_ONOPEN](state, event)  {
+      /*eslint no-unused-vars: 0*/
+      state.socket.isConnected = true
     },
-    id_sequence(state, id_sequence) {
-      state.id_sequence = id_sequence
+    [SOCKET_ONCLOSE](state, event)  {
+      state.socket.isConnected = false
     },
-    id_frame(state, id_frame) {
-      state.id_frame = id_frame
+    [SOCKET_ONERROR](state, event)  {
+      console.error(state, event)
     },
-    id_selected_cad(state, id_selected_cad) {
-      state.id_selected_cad = id_selected_cad
+    // default handler called for all methods
+    [SOCKET_ONMESSAGE](state, message)  {
+      state.socket.message = message
     },
-    id_selected_instance(state, id_selected_instance) {
-      state.id_selected_instance = id_selected_instance
+    // mutations for reconnect methods
+    [SOCKET_RECONNECT](state, count) {
+      console.info(state, count)
     },
-    duration_retrieval(state, duration_retrieval) {
-      state.duration_retrieval = duration_retrieval
+    [SOCKET_RECONNECT_ERROR](state) {
+      state.socket.reconnectError = true;
     },
-    mesh_lidar(state, mesh_lidar) {
-      state.mesh_lidar = mesh_lidar
-    },
-    camera(state, camera) {
-      state.camera = camera
-    },
-    controls(state, controls) {
-      state.controls = controls
-    },
-    meshes_cad_push(state, mesh_cad) {
-      state.meshes_cad.push(mesh_cad);
-    },
-    annotations_push(state, annotation) {
-      state.annotations.push(annotation);
-    },
-    annotations(state, annotation) {
-      state.annotations = annotation;
+    scene(state, scene) {
+      state.scene = scene
     },
   }
-
 })
+

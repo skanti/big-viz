@@ -110,6 +110,8 @@ export default class Viewer extends Vue {
   }
 
   onclick_grab() {
+    this.$socket.send('some data')
+
     console.log(this.text);
   }
 

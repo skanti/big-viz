@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const http = require('http');
 const math = require('mathjs');
+const ws = require('ws');
 
 const axios = require("axios");
 axios.defaults.baseURL = process.env.URL_SERVER;
@@ -112,4 +113,11 @@ const handle = http.createServer(app);
 
 handle.listen({"port" : port, "host" : hostname}, () => {
   console.log(`Server running at ${url}`);
+});
+
+let ws_handle = new ws.Server({port: process.env.PORT_WEBSOCKET, 'Access-Control-Allow-Origin': "*"});
+ws_handle.on('connection', ws => {
+  ws.on('message', msg => {
+    console.log(`Received message => ${msg}`)
+  })
 });
