@@ -58,12 +58,13 @@ export default {
       return this.$store.state.scene;
     },
     rows: function() {
-      if (!this.scene)
+      const children = this.scene.children;
+      if (children === undefined || children.length == 0)
         return [];
 
       let rows = [];
       let name_mapping = {};
-      for (let [i,obj] of Object.entries(this.scene.children)) {
+      for (let [i,obj] of Object.entries(children)) {
         let type = obj.type;
         if (type.includes("Light"))
           continue

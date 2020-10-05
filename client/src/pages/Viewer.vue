@@ -15,6 +15,7 @@
       </div>
     </div>
 
+    <!-- search bar -->
     <div class="row q-pa-sm" id="div_menu_bar">
       <div class="row items-center q-col-gutter-md" style="width:100%">
         <div class="col-11">
@@ -28,11 +29,22 @@
         </div>
       </div>
     </div>
+    <!-- search bar -->
+
+    <!-- status -->
+    <div class="row q-pa-sm" id="div_status_bar">
+      <div class="flex items-center q-col-gutter-md" style="width:100%">
+        <div>
+          <q-btn @click="onclick_clear_cache" label="Clear Cache" class="text-bold" color="negative" icon="fas fa-trash" >  </q-btn>
+        </div>
+      </div>
+    </div>
+    <!-- status -->
 
     <div class="row q-col-gutter-sm q-pa-sm">
       <div class="col-9">
         <q-chip class="q-ma-none q-my-sm" color="primary" text-color="white" icon="fas fa-cube" square> Canvas </q-chip>
-        <div ref="div_scene" style="width:100%;height:50vh"> </div>
+        <div ref="div_scene" style="width:100%;height:70vh"> </div>
       </div>
       <div class="col-3">
         <q-chip class="q-ma-none q-my-sm" color="primary" text-color="white" icon="fas fa-bars" square> Menu </q-chip>

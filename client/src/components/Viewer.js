@@ -12,7 +12,7 @@ import Renderer from '@/components/Renderer.js';
 @Component({
   name: "Viewer",
   components: { Menu },
-  computed: mapState([ "scene" ])
+  computed: mapState([ "scene", "scene_serialized", "dummy" ])
 })
 export default class Viewer extends Vue {
 
@@ -33,19 +33,20 @@ export default class Viewer extends Vue {
   }
 
   init() {
+    // -> init renderer
     this.renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
     this.renderer.camera.position.set(3,2,1); 
     this.renderer.controls.target.set(0,0,0); 
     this.renderer.controls.update();
+    this.$store.commit("scene", this.renderer.scene);
+    // <-
 
     // -> set listeners
-    this.ctx.event_bus.$on("onclick_mouse_renderer", this.onclick_mouse.bind(this));
     this.ctx.event_bus.$on("onclick_mouse_renderer", this.onclick_mouse.bind(this));
     // <-
 
     // -> trigger
     this.add_ground_plane_to_scene();
-    this.$store.commit("scene", this.renderer.scene);
     // <-
 
     // -> add listener
@@ -63,7 +64,13 @@ export default class Viewer extends Vue {
   }
 
   mounted() {
+    console.log("dummy", this.dummy);
+    this.$store.commit("dummy_increment", this.dummy)
     this.init();
+  }
+
+  onclick_clear_cache() {
+    localStorage.clear();
   }
 
   add_bbox_to_scene() {
@@ -190,7 +197,6 @@ export default class Viewer extends Vue {
 
     for (let [i,v] of Object.entries(this.renderer.scene.children)) {
       const is_match = v["name"] === id;
-      console.log("name", v["name"]);
       if (is_match) {
         this.renderer.scene.remove(v);
         break;
@@ -232,6 +238,7 @@ export default class Viewer extends Vue {
         this.add_ply_to_scene(data);
       else if (type === "points")
         this.add_points_to_scene(data);
+
     } catch (err){
       console.log(err);
     }

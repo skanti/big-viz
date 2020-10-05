@@ -38,13 +38,10 @@ class Renderer {
     this.camera.position.x = 0.0;
     this.camera.position.z = 1.0;
 
-
     this.scene.add( new THREE.AmbientLight( 0x555555 ) );
-
     let light = new THREE.DirectionalLight( 0xffffff, 0.5 );
     light.position.set(0.1,0.1,1);
     this.scene.add( light );
-
     this.scene.background = new THREE.Color("rgb(240, 230, 230)");
 
     this.renderer.setPixelRatio( window.devicePixelRatio );
