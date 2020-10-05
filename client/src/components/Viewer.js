@@ -147,7 +147,27 @@ export default class Viewer extends Vue {
 
     let material = new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide });
     let mesh = new THREE.Mesh( geometry, material );
+    this.apply_trs(mesh, data["trs"]);
     this.upsert_mesh(data["id"], mesh);
+  }
+
+  apply_trs(mesh, trs) {
+    if (trs == null)
+      return
+    let trans = new THREE.Vector3(0, 0, 0);
+    if ("translation" in trs)
+      trans = new THREE.Vector3(trs["translation"][0], trs["translation"][1], trs["translation"][2]);
+    let rot = new THREE.Quaternion(0, 0, 0, 1);
+    if ("rotation" in trs)
+      rot = new THREE.Quaternion(trs["rotation"][1], trs["rotation"][2], trs["rotation"][3], trs["rotation"][0]);
+    let scale = new THREE.Vector3(1, 1, 1);
+    if ("scale" in trs)
+      scale = new THREE.Vector3(trs["scale"][0], trs["scale"][1], trs["scale"][2]);
+
+    let mat = new THREE.Matrix4();
+    mat.compose(trans, rot, scale);
+
+    mesh.applyMatrix4(mat);
   }
 
 
@@ -189,7 +209,7 @@ export default class Viewer extends Vue {
       }
     }
 
-
+    this.apply_trs(mesh, data["trs"]);
     this.upsert_mesh(data["id"], mesh);
   }
 
