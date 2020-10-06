@@ -1,7 +1,4 @@
-<template>
-  <q-page>
-
-    <div v-if="mode==='loading'" class="q-gutter-md fixed-center text-center">
+<template> <q-page> <div v-if="mode==='loading'" class="q-gutter-md fixed-center text-center">
       <q-spinner-grid color="primary" size="xl">  </q-spinner-grid>
       <div>
         <q-badge> {{this.mode_msg}} </q-badge>
@@ -19,13 +16,13 @@
     <div class="row q-pa-sm" id="div_menu_bar">
       <div class="row items-center q-col-gutter-md" style="width:100%">
         <div class="col-11">
-          <q-input class="q-pa-none"  v-model="text" label="File Path" rounded standout bottom-slots>
+          <q-input class="q-pa-none" v-model="search_text" label="File Path" input-class="text-bold" standout="bg-primary text-white" rounded bottom-slots>
             <template v-slot:prepend> <q-icon name="fas fa-file" /> </template>
-            <template v-slot:append> <q-icon name="fas fa-times" @click="text = ''" class="cursor-pointer" /> </template>
+            <template v-slot:append> <q-icon name="fas fa-times" @click="search_text = ''" class="cursor-pointer" /> </template>
           </q-input>
         </div>
         <div class="col-1">
-          <q-btn @click="onclick_grab" label="Grab" class="text-bold fit" color="primary" icon="fas fa-arrow-circle-right" >  </q-btn>
+          <q-btn @click="onclick_grab" label="Grab" class="text-bold fit" color="primary" icon="fas fa-arrow-circle-right" :disable='search_text == ""'>  </q-btn>
         </div>
       </div>
     </div>

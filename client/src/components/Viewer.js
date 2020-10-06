@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
-//import axios from 'axios';
+import axios from 'axios';
 import * as THREE from "three";
 
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 
 import Menu  from '@/components/Menu.vue';
@@ -12,7 +12,16 @@ import Renderer from '@/components/Renderer.js';
 @Component({
   name: "Viewer",
   components: { Menu },
-  computed: mapState([ "scene", "scene_serialized", "dummy" ])
+  computed: { 
+    search_text: {
+      get () {
+        return this.$store.state.search_text;
+      },
+      set (v) {
+        this.$store.commit("search_text", v);
+      }
+    }
+  }
 })
 export default class Viewer extends Vue {
 
@@ -22,7 +31,6 @@ export default class Viewer extends Vue {
       ctx : { event_bus: new Vue() },
       mode : "loading",
       mode_msg : "Loading...",
-      text: "",
       status : "OK",
       is_active : false,
       mesh_bbox : null,
@@ -64,8 +72,8 @@ export default class Viewer extends Vue {
   }
 
   mounted() {
-    console.log("dummy", this.dummy);
-    this.$store.commit("dummy_increment", this.dummy)
+    //console.log("dummy", this.dummy);
+    //this.$store.commit("dummy_increment", this.dummy)
     this.init();
   }
 
@@ -151,25 +159,6 @@ export default class Viewer extends Vue {
     this.upsert_mesh(data["id"], mesh);
   }
 
-  apply_trs(mesh, trs) {
-    if (trs == null)
-      return
-    let trans = new THREE.Vector3(0, 0, 0);
-    if ("translation" in trs)
-      trans = new THREE.Vector3(trs["translation"][0], trs["translation"][1], trs["translation"][2]);
-    let rot = new THREE.Quaternion(0, 0, 0, 1);
-    if ("rotation" in trs)
-      rot = new THREE.Quaternion(trs["rotation"][1], trs["rotation"][2], trs["rotation"][3], trs["rotation"][0]);
-    let scale = new THREE.Vector3(1, 1, 1);
-    if ("scale" in trs)
-      scale = new THREE.Vector3(trs["scale"][0], trs["scale"][1], trs["scale"][2]);
-
-    let mat = new THREE.Matrix4();
-    mat.compose(trans, rot, scale);
-
-    mesh.applyMatrix4(mat);
-  }
-
 
   add_points_to_scene(data) {
     if (!("positions" in data))
@@ -192,16 +181,17 @@ export default class Viewer extends Vue {
     if (!colors_buff && !color_buff)
       color = new THREE.Color(Math.random(), Math.random(), Math.random());
 
+    let mat = this.compose_mat4(data["trs"]);
+
     const geometry = new THREE.BoxBufferGeometry(res, res, res);
     const material = new THREE.MeshLambertMaterial( { color: color });
     const n_positions = positions_buff.length;
     let mesh = new THREE.InstancedMesh( geometry, material, n_positions );
     for (let i = 0; i < n_positions; i++) {
-      const trans = new THREE.Vector3(positions_buff[i][0], positions_buff[i][1], positions_buff[i][2]);
-      const rot = new THREE.Quaternion();
-      const scale = new THREE.Vector3(1, 1, 1);
-      let trs = new THREE.Matrix4();
-      trs = trs.compose(trans, rot, scale);
+      let t = new THREE.Vector4(positions_buff[i][0], positions_buff[i][1], positions_buff[i][2], 1);
+      t = t.applyMatrix4(mat);
+
+      let trs = (new THREE.Matrix4()).makeTranslation(t.x, t.y, t.z);
       mesh.setMatrixAt(i, trs);
       if (colors_buff) {
         const c = new THREE.Color(colors_buff[i][0], colors_buff[i][1], colors_buff[i][2]);
@@ -209,8 +199,34 @@ export default class Viewer extends Vue {
       }
     }
 
-    this.apply_trs(mesh, data["trs"]);
     this.upsert_mesh(data["id"], mesh);
+  }
+
+  compose_mat4(trs) {
+    let trans = new THREE.Vector3(0, 0, 0);
+    let rot = new THREE.Quaternion(0, 0, 0, 1);
+    let scale = new THREE.Vector3(1, 1, 1);
+    let mat = new THREE.Matrix4();
+    mat.compose(trans, rot, scale);
+
+    if (trs == null)
+      return mat;
+
+    if ("translation" in trs)
+      trans = new THREE.Vector3(trs["translation"][0], trs["translation"][1], trs["translation"][2]);
+    if ("rotation" in trs)
+      rot = new THREE.Quaternion(trs["rotation"][1], trs["rotation"][2], trs["rotation"][3], trs["rotation"][0]);
+    if ("scale" in trs)
+      scale = new THREE.Vector3(trs["scale"][0], trs["scale"][1], trs["scale"][2]);
+
+    mat.compose(trans, rot, scale);
+    return mat
+
+  }
+
+  apply_trs(mesh, trs) {
+    let mat = this.compose_mat4(trs);
+    mesh.applyMatrix4(mat);
   }
 
   upsert_mesh(id, mesh) {
@@ -259,6 +275,7 @@ export default class Viewer extends Vue {
       else if (type === "points")
         this.add_points_to_scene(data);
 
+      this.ctx.event_bus.$emit("new_object");
     } catch (err){
       console.log(err);
     }
@@ -266,8 +283,12 @@ export default class Viewer extends Vue {
 
 
   onclick_grab() {
-    this.add_bbox_to_scene();
-    this.ctx.event_bus.$emit("new_object");
+    const path_data = process.env.VUE_APP_URL_SERVER + "/data/" + this.search_text;
+    axios.get(path_data, { responseType: 'arraybuffer' }).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log("error", err);
+    });
   }
 
   raycast() {

@@ -20,7 +20,7 @@
 		"mocha": "^7.1.1"
 	},
 	"scripts": {
-		"dev": "nodemon index.js",
+		"dev": "nodemon --ignore static/ index.js",
 		"start": "node index.js",
 		"test": "mocha --reporter spec"
 	},
