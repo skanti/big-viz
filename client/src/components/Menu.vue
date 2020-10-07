@@ -19,12 +19,10 @@
       </template>
 
 
-      <template v-slot:header-selection="scope">
-        <q-toggle v-model="scope.selected" />
+      <template v-slot:header-selection="">
       </template>
 
-      <template v-slot:body-selection="scope">
-        <q-toggle v-model="scope.selected" />
+      <template v-slot:body-selection="" selected="props.visible">
       </template>
 
     </q-table>
@@ -75,7 +73,7 @@ export default {
         let name = obj.type + name_mapping[type];
         if (obj.name)
           name = obj.name;
-        let item = { idx: i, id: name, type: obj.type };
+        let item = { idx: i, id: name, type: obj.type, visible: obj.visible };
         rows.push(item);
       }
       return rows;
@@ -85,9 +83,9 @@ export default {
     this.ctx.event_bus.$on("new_object", this.add_new_object);
   }, methods : { 
     add_new_object: function () {
-      console.log(this.scene);
     },
     toggle_visibility: function(r) {
+      console.log("toggle");
       /*eslint no-unused-vars: "off"*/
       for (let [i,k] of Object.entries(r.rows)) {
         let idx = k.idx;

@@ -57,7 +57,6 @@ router.get("/data/*", function(req, res, next) {
   search_and_find_file(filename).then(file => {
       res.sendFile(file)
     }).catch(err => {
-      console.log(err.message);
       res.status(500).send({ msg: err.message })
     });
 });

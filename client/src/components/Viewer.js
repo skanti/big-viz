@@ -1,9 +1,12 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import axios from 'axios';
+import path from 'path';
 import * as THREE from "three";
+import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
+import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2.js';
 
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 
 
 import Menu  from '@/components/Menu.vue';
@@ -114,7 +117,7 @@ export default class Viewer extends Vue {
     this.renderer.scene.add( helper );
   }
 
-  add_ply_to_scene(data) {
+  add_verts_and_faces_to_scene(data) {
     if (!("verts" in data))
       throw Error("No 'verts' in data");
     if (!("faces" in data))
@@ -202,6 +205,32 @@ export default class Viewer extends Vue {
     this.upsert_mesh(data["id"], mesh);
   }
 
+  add_ply_to_scene(id, buffer) {
+    const loader = new PLYLoader();
+    const geometry = loader.parse(buffer);
+    geometry.computeVertexNormals();
+    let color = new THREE.Color("rgb(250, 250, 150)")
+    const material = new THREE.MeshLambertMaterial( { color: color, side: THREE.DoubleSide});
+    const mesh = new THREE.Mesh( geometry, material );
+
+    this.upsert_mesh(id, mesh);
+  }
+
+  add_obj_to_scene(id, buffer) {
+    const loader = new OBJLoader2();
+    const mesh = loader.parse(buffer);
+    let color = new THREE.Color("rgb(250, 250, 150)");
+    const material = new THREE.MeshLambertMaterial( { color: color, side: THREE.DoubleSide});
+    //const mesh = new THREE.Mesh( geometry, material );
+    mesh.traverse(function(child) {
+      if (child instanceof THREE.Mesh) {
+        child.material = material;
+      }
+    });
+
+    this.upsert_mesh(id, mesh);
+  }
+
   compose_mat4(trs) {
     let trans = new THREE.Vector3(0, 0, 0);
     let rot = new THREE.Quaternion(0, 0, 0, 1);
@@ -271,9 +300,33 @@ export default class Viewer extends Vue {
 
     try {
       if (type === "ply")
-        this.add_ply_to_scene(data);
+        this.add_verts_and_faces_to_scene(data);
       else if (type === "points")
         this.add_points_to_scene(data);
+
+      this.ctx.event_bus.$emit("new_object");
+    } catch (err){
+      console.log(err);
+    }
+  }
+
+  on_grab_data(filename, data) {
+    try {
+      let suffix = filename.split('.').pop();
+      let id = path.basename(path.dirname(filename)) + path.basename(filename);
+      const mesh_types = new Set(["ply", "obj"]);
+      const vox_types = new Set(["vox", "svox", "svoxrgb"]);
+
+      const accepted_types = new Set([...mesh_types, ...vox_types]);
+      console.log(filename, accepted_types);
+      if (!accepted_types.has(suffix)) {
+        throw "Warning: Received data has unknown suffix: " + suffix;
+      }
+
+      if (suffix === "ply")
+        this.add_ply_to_scene(id, data);
+      else if (suffix === "obj")
+        this.add_obj_to_scene(id, data);
 
       this.ctx.event_bus.$emit("new_object");
     } catch (err){
@@ -285,7 +338,7 @@ export default class Viewer extends Vue {
   onclick_grab() {
     const path_data = process.env.VUE_APP_URL_SERVER + "/data/" + this.search_text;
     axios.get(path_data, { responseType: 'arraybuffer' }).then(res => {
-      console.log(res);
+      this.on_grab_data(this.search_text, res.data);
     }).catch(err => {
       console.log("error", err);
     });
