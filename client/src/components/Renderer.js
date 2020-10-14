@@ -13,7 +13,7 @@ class Renderer {
     this.win = {width : 0, height : 0 };
     this.camera = null;
     this.scene = new THREE.Scene();
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     this.controls = null;
     this.mouse = { pos: new THREE.Vector2(), is_drag: false };
     this.stats_fps = new Stats();

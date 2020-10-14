@@ -83,6 +83,19 @@ export default class Viewer extends Vue {
   onclick_clear_cache() {
     localStorage.clear();
   }
+  onclick_screenshot() {
+    var img = new Image();
+    img.src = this.renderer.renderer.domElement.toDataURL();
+    document.body.appendChild(img);
+    var r = document.createRange();
+    r.setStartBefore(img);
+    r.setEndAfter(img);
+    r.selectNode(img);
+    var sel = window.getSelection();
+    sel.addRange(r);
+    document.execCommand('Copy');
+    document.body.removeChild(img);
+  }
 
   add_bbox_to_scene() {
     const n_instances = 1;

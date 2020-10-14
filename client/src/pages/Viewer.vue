@@ -32,7 +32,7 @@
     <div class="row q-pa-sm" id="div_status_bar">
       <div class="flex items-center q-col-gutter-md" style="width:100%">
         <div>
-          <q-btn @click="onclick_clear_cache" label="Clear Cache" class="text-bold" color="negative" icon="fas fa-trash" >  </q-btn>
+          <q-btn @click="onclick_screenshot" label="Screenshot" class="text-bold" color="blue" icon="fas fa-camera" >  </q-btn>
         </div>
       </div>
     </div>
