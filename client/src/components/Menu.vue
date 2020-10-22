@@ -9,6 +9,7 @@
       selection="multiple"
       :selected.sync="selected"
       @selection="toggle_visibility"
+      :pagination="pagination"
       >
       <template v-slot:top-left>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
@@ -45,10 +46,8 @@ export default {
       ],
 
       pagination: {
-        sortBy: 'desc',
-        descending: false,
         page: 1,
-        rowsPerPage: 10
+        rowsPerPage: 20
       },
     }
   }, computed: {

@@ -97,20 +97,25 @@ export default class Viewer extends Vue {
     document.body.removeChild(img);
   }
 
-  add_bbox_to_scene() {
-    const n_instances = 1;
+  add_box_to_scene(data) {
 
-    const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-    const material = new THREE.MeshLambertMaterial({ });
-    let mesh = new THREE.InstancedMesh( geometry, material, n_instances );
-    for (let i = 0; i < n_instances; i++) {
-      const trs = new THREE.Matrix4();
-      const color = new THREE.Color("rgb(200, 200, 0)");
-      mesh.setMatrixAt(i, trs);
-      mesh.setColorAt(i, color);
-
+    let color = null;
+    const color_buff = data["color"];
+    if (color_buff) {
+      if (color_buff.length != 3)
+        throw Error("'color' element has to size=3");
+      color = new THREE.Color(color_buff[0], color_buff[1], color_buff[2]);
     }
-    this.renderer.scene.add(mesh);
+
+    const g = new THREE.BoxBufferGeometry(1, 1, 1);
+    const geometry = new THREE.WireframeGeometry(g);
+    const material = new THREE.LineBasicMaterial({ color: color, linewidth: 5 });
+    const wireframe = new THREE.LineSegments( geometry, material );
+
+    this.apply_trs(wireframe, data["trs"]);
+    this.upsert_mesh(data["id"], wireframe);
+
+    this.renderer.scene.add(wireframe);
   }
 
   add_ground_plane_to_scene() {
@@ -196,6 +201,11 @@ export default class Viewer extends Vue {
 
     if (!colors_buff && !color_buff)
       color = new THREE.Color(Math.random(), Math.random(), Math.random());
+
+    if (colors_buff) {
+      if (colors_buff.length != positions_buff.length)
+        throw Error("'positions' and 'colors' have to have same length");
+    }
 
     let mat = this.compose_mat4(data["trs"]);
 
@@ -305,7 +315,7 @@ export default class Viewer extends Vue {
     data = JSON.parse(data);
     let type = data["type"];
 
-		let accepted_types = new Set(["ply", "points"]);
+		let accepted_types = new Set(["ply", "points", "box"]);
     if (!accepted_types.has(type)) {
       console.log("Warning: Received data has unknown type. Type: ", type);
       return
@@ -316,6 +326,8 @@ export default class Viewer extends Vue {
         this.add_verts_and_faces_to_scene(data);
       else if (type === "points")
         this.add_points_to_scene(data);
+      else if (type === "box")
+        this.add_box_to_scene(data);
 
       this.ctx.event_bus.$emit("new_object");
     } catch (err){
