@@ -83,15 +83,41 @@ export default class Viewer extends Vue {
   onclick_clear_cache() {
     localStorage.clear();
   }
+
+  onclick_clear_canvas() {
+    const children = this.renderer.scene.children;
+    if (children === undefined || children.length == 0)
+      return;
+
+    let survived = [];
+    for (let [i,obj] of Object.entries(children)) {
+      let type = obj.type;
+      if (type.includes("Light"))
+        survived.push(obj);
+      if (type.includes("Grid"))
+        survived.push(obj);
+    }
+    this.renderer.scene.children = survived;
+  }
+
+  onclick_save_screenshot() {
+    let img = new Image();
+    let src = this.renderer.renderer.domElement.toDataURL();
+    let a = document.createElement("a");
+    a.href = src.replace("image/png", "image/octet-stream");
+    a.download = "canvas_" + (new Date()).toISOString() + ".png";
+    a.click();
+  }
+
   onclick_screenshot() {
-    var img = new Image();
+    let img = new Image();
     img.src = this.renderer.renderer.domElement.toDataURL();
     document.body.appendChild(img);
-    var r = document.createRange();
+    let r = document.createRange();
     r.setStartBefore(img);
     r.setEndAfter(img);
     r.selectNode(img);
-    var sel = window.getSelection();
+    let sel = window.getSelection();
     sel.addRange(r);
     document.execCommand('Copy');
     document.body.removeChild(img);

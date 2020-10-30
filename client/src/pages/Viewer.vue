@@ -31,8 +31,10 @@
     <!-- status -->
     <div class="row q-pa-sm" id="div_status_bar">
       <div class="flex items-center q-col-gutter-md" style="width:100%">
-        <div>
-          <q-btn @click="onclick_screenshot" label="Screenshot" class="text-bold" color="blue" icon="fas fa-camera" >  </q-btn>
+        <div class="q-gutter-sm">
+          <q-btn @click="onclick_screenshot" label="Screenshot" class="text-bold" color="blue-5" icon="fas fa-camera" >  </q-btn>
+          <q-btn @click="onclick_save_screenshot" label="Save Screenshot" class="text-bold" color="blue-5" icon="fas fa-download" >  </q-btn>
+          <q-btn @click="onclick_clear_canvas" label="Clear Canvas" class="text-bold" color="red-5" icon="fas fa-times" >  </q-btn>
         </div>
       </div>
     </div>
