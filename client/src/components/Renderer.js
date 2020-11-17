@@ -105,6 +105,19 @@ class Renderer {
     this.renderer.render(this.scene, this.camera);
     this.stats_fps.update();
   }
+
+  upsert_mesh(id, mesh) {
+
+    for (let v of Object.values(this.scene.children)) {
+      const is_match = v["name"] === id;
+      if (is_match) {
+        this.scene.remove(v);
+        break;
+      }
+    }
+    mesh.name = id;
+    this.scene.add(mesh);
+  }
 }
 
 export default Renderer;

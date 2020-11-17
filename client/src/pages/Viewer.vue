@@ -47,7 +47,8 @@
       </div>
       <div class="col-3">
         <q-chip class="q-ma-none q-my-sm" color="primary" text-color="white" icon="fas fa-bars" square> Menu </q-chip>
-        <Menu ref="menu" class="full-width" :ctx="ctx"/>
+        <Menu ref="menu" class="full-width" :ctx="ctx"></Menu>
+        <component :is="toolbox" v-bind="toolbox_props" class="full-width" :ctx="ctx"></component>
       </div>
     </div>
 

@@ -9,12 +9,16 @@ import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2.js';
 import { mapState } from 'vuex'
 
 
-import Menu  from '@/components/Menu.vue';
+import Menu from '@/components/Menu.vue';
+import Toolbox from '@/components/Toolbox.vue';
 import Renderer from '@/components/Renderer.js';
+import Context from '@/components/Context.js';
+
+import PCAObject from '@/components/objects/PCAObject.js';
 
 @Component({
   name: "Viewer",
-  components: { Menu },
+  components: { Menu, Toolbox },
   computed: { 
     search_text: {
       get () {
@@ -22,7 +26,7 @@ import Renderer from '@/components/Renderer.js';
       },
       set (v) {
         this.$store.commit("search_text", v);
-      }
+      },
     }
   }
 })
@@ -31,15 +35,17 @@ export default class Viewer extends Vue {
 
   data() {
     return {
-      ctx : { event_bus: new Vue() },
-      mode : "loading",
-      mode_msg : "Loading...",
-      status : "OK",
-      is_active : false,
-      mesh_bbox : null,
-      raycaster : new THREE.Raycaster(),
+      ctx: new Context(),
+      mode: "loading",
+      mode_msg: "Loading...",
+      status: "OK",
+      is_active: false,
+      mesh_bbox: null,
+      raycaster: new THREE.Raycaster(),
       id_raycast: -1,
-      renderer : null,
+      renderer: null,
+      toolbox: null,
+      toolbox_props: {},
     }
   }
 
@@ -54,6 +60,7 @@ export default class Viewer extends Vue {
 
     // -> set listeners
     this.ctx.event_bus.$on("onclick_mouse_renderer", this.onclick_mouse.bind(this));
+    this.ctx.event_bus.$on("selected", this.onclick_selected.bind(this));
     // <-
 
     // -> trigger
@@ -139,7 +146,7 @@ export default class Viewer extends Vue {
     const wireframe = new THREE.LineSegments( geometry, material );
 
     this.apply_trs(wireframe, data["trs"]);
-    this.upsert_mesh(data["id"], wireframe);
+    this.renderer.upsert_mesh(data["id"], wireframe);
 
     this.renderer.scene.add(wireframe);
   }
@@ -203,7 +210,7 @@ export default class Viewer extends Vue {
     let material = new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide });
     let mesh = new THREE.Mesh( geometry, material );
     this.apply_trs(mesh, data["trs"]);
-    this.upsert_mesh(data["id"], mesh);
+    this.renderer.upsert_mesh(data["id"], mesh);
   }
 
 
@@ -251,7 +258,14 @@ export default class Viewer extends Vue {
       }
     }
 
-    this.upsert_mesh(data["id"], mesh);
+    this.renderer.upsert_mesh(data["id"], mesh);
+  }
+
+  add_pca_sdf_to_scene(data) {
+
+    let pca = new PCAObject(this.ctx, this.renderer);
+    pca.parse_from_json(data);
+    pca.make();
   }
 
   add_ply_to_scene(id, buffer) {
@@ -262,7 +276,7 @@ export default class Viewer extends Vue {
     const material = new THREE.MeshLambertMaterial( { color: color, side: THREE.DoubleSide});
     const mesh = new THREE.Mesh( geometry, material );
 
-    this.upsert_mesh(id, mesh);
+    this.renderer.upsert_mesh(id, mesh);
   }
 
   add_obj_to_scene(id, buffer) {
@@ -277,7 +291,7 @@ export default class Viewer extends Vue {
       }
     });
 
-    this.upsert_mesh(id, mesh);
+    this.renderer.upsert_mesh(id, mesh);
   }
 
   compose_mat4(trs) {
@@ -307,22 +321,34 @@ export default class Viewer extends Vue {
     mesh.applyMatrix4(mat);
   }
 
-  upsert_mesh(id, mesh) {
-
-    for (let [i,v] of Object.entries(this.renderer.scene.children)) {
-      const is_match = v["name"] === id;
-      if (is_match) {
-        this.renderer.scene.remove(v);
-        break;
-      }
-    }
-    mesh.name = id;
-    this.renderer.scene.add(mesh);
-
-  }
 
   onclick_mouse(event) {
     this.onclick_instance(event);
+  }
+
+  onclick_selected(selected) {
+    let id = selected["id"];
+    if (!id) {
+      this.toolbox = "";
+      return;
+    }
+
+    let obj = null;
+    for (let v of Object.values(this.renderer.scene.children)) {
+      const is_match = v["name"] === id;
+      if (is_match) {
+        obj = v.raw;
+        break;
+      }
+    }
+
+    if (obj === null)
+      return;
+
+    if (obj.type == "pca_sdf") {
+      this.toolbox = Toolbox;
+      this.toolbox_props = {  variances: obj.variances };
+    }
   }
 
 
@@ -354,6 +380,8 @@ export default class Viewer extends Vue {
         this.add_points_to_scene(data);
       else if (type === "box")
         this.add_box_to_scene(data);
+      else if (type === "pca_sdf")
+        this.add_pca_sdf_to_scene(data);
 
       this.ctx.event_bus.$emit("new_object");
     } catch (err){
