@@ -341,7 +341,7 @@ export default class Viewer extends Vue {
     data = JSON.parse(data);
     let type = data["type"];
 
-		let accepted_types = new Set(["ply", "points", "box"]);
+		let accepted_types = new Set(["ply", "points", "box", "pca_sdf"]);
     if (!accepted_types.has(type)) {
       console.log("Warning: Received data has unknown type. Type: ", type);
       return

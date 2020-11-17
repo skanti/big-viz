@@ -89,9 +89,10 @@ ws_handle.on('connection', socket => {
 		socket.broadcast.to(data.to).emit('client-nudged', data)
 	})
 
-	socket.on('data', data => {
-    socket.broadcast.emit("data", data);
+  socket.on('data', data => {
+    data = decodeURIComponent(escape(data));
     socket.emit("ok");
+    socket.broadcast.emit("data", data);
 	})
 })
 
