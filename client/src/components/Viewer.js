@@ -15,6 +15,7 @@ import Renderer from '@/components/Renderer.js';
 import Context from '@/components/Context.js';
 
 import PCAObject from '@/components/objects/PCAObject.js';
+import PointObject from '@/components/objects/PointObject.js';
 
 @Component({
   name: "Viewer",
@@ -215,53 +216,12 @@ export default class Viewer extends Vue {
 
 
   add_points_to_scene(data) {
-    if (!("positions" in data))
-      throw Error("'points' not in data");
-    if (!("res" in data))
-      throw Error("'res' not in data");
-
-    const positions_buff = data["positions"];
-    const colors_buff = data["colors"];
-    const res = data["res"];
-
-    let color = null;
-    let color_buff =  data["color"];
-    if (color_buff) {
-      if (color_buff.length != 3)
-        throw Error("'color' element has to size=3");
-      color = new THREE.Color(color_buff[0], color_buff[1], color_buff[2]);
-    }
-
-    if (!colors_buff && !color_buff)
-      color = new THREE.Color(Math.random(), Math.random(), Math.random());
-
-    if (colors_buff) {
-      if (colors_buff.length != positions_buff.length)
-        throw Error("'positions' and 'colors' have to have same length");
-    }
-
-    let mat = this.compose_mat4(data["trs"]);
-
-    const geometry = new THREE.BoxBufferGeometry(res, res, res);
-    const material = new THREE.MeshLambertMaterial( { color: color });
-    const n_positions = positions_buff.length;
-    let mesh = new THREE.InstancedMesh( geometry, material, n_positions );
-    for (let i = 0; i < n_positions; i++) {
-      let t = new THREE.Vector4(positions_buff[i][0], positions_buff[i][1], positions_buff[i][2], 1);
-      t = t.applyMatrix4(mat);
-
-      let trs = (new THREE.Matrix4()).makeTranslation(t.x, t.y, t.z);
-      mesh.setMatrixAt(i, trs);
-      if (colors_buff) {
-        const c = new THREE.Color(colors_buff[i][0], colors_buff[i][1], colors_buff[i][2]);
-        mesh.setColorAt(i, c);
-      }
-    }
-
-    this.renderer.upsert_mesh(data["id"], mesh);
+    let points = new PointObject(this.ctx, this.renderer);
+    points.parse_from_json(data);
+    points.make();
   }
 
-  add_pca_sdf_to_scene(data) {
+  add_pca_grid_to_scene(data) {
 
     let pca = new PCAObject(this.ctx, this.renderer);
     pca.parse_from_json(data);
@@ -294,27 +254,6 @@ export default class Viewer extends Vue {
     this.renderer.upsert_mesh(id, mesh);
   }
 
-  compose_mat4(trs) {
-    let trans = new THREE.Vector3(0, 0, 0);
-    let rot = new THREE.Quaternion(0, 0, 0, 1);
-    let scale = new THREE.Vector3(1, 1, 1);
-    let mat = new THREE.Matrix4();
-    mat.compose(trans, rot, scale);
-
-    if (trs == null)
-      return mat;
-
-    if ("translation" in trs)
-      trans = new THREE.Vector3(trs["translation"][0], trs["translation"][1], trs["translation"][2]);
-    if ("rotation" in trs)
-      rot = new THREE.Quaternion(trs["rotation"][1], trs["rotation"][2], trs["rotation"][3], trs["rotation"][0]);
-    if ("scale" in trs)
-      scale = new THREE.Vector3(trs["scale"][0], trs["scale"][1], trs["scale"][2]);
-
-    mat.compose(trans, rot, scale);
-    return mat
-
-  }
 
   apply_trs(mesh, trs) {
     let mat = this.compose_mat4(trs);
@@ -345,7 +284,7 @@ export default class Viewer extends Vue {
     if (obj === null)
       return;
 
-    if (obj.type == "pca_sdf") {
+    if (obj.type == "pca_grid") {
       this.toolbox = Toolbox;
       this.toolbox_props = {  variances: obj.variances };
     }
@@ -367,7 +306,7 @@ export default class Viewer extends Vue {
     data = JSON.parse(data);
     let type = data["type"];
 
-		let accepted_types = new Set(["ply", "points", "box", "pca_sdf"]);
+		let accepted_types = new Set(["ply", "points", "box", "pca_grid"]);
     if (!accepted_types.has(type)) {
       console.log("Warning: Received data has unknown type. Type: ", type);
       return
@@ -380,8 +319,8 @@ export default class Viewer extends Vue {
         this.add_points_to_scene(data);
       else if (type === "box")
         this.add_box_to_scene(data);
-      else if (type === "pca_sdf")
-        this.add_pca_sdf_to_scene(data);
+      else if (type === "pca_grid")
+        this.add_pca_grid_to_scene(data);
 
       this.ctx.event_bus.$emit("new_object");
     } catch (err){

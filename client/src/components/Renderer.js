@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+  import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 class Renderer {
   constructor(ctx, div_root, tag) {
@@ -14,6 +15,7 @@ class Renderer {
     this.camera = null;
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    this.renderer_badge = new CSS2DRenderer();
     this.controls = null;
     this.mouse = { pos: new THREE.Vector2(), is_drag: false };
     this.stats_fps = new Stats();
@@ -47,6 +49,13 @@ class Renderer {
     this.renderer.setPixelRatio( window.devicePixelRatio );
     this.renderer.setSize(this.win.width, this.win.height);
     this.root_container.appendChild( this.renderer.domElement );
+    this.root_container.appendChild( this.renderer_badge.domElement );
+
+    const rect = this.root_container.getBoundingClientRect();
+    this.renderer_badge.setSize(this.win.width, this.win.height);
+    this.renderer_badge.domElement.style.position = 'absolute';
+    this.renderer_badge.domElement.style.top = (rect.top - 50 ) + "px";
+
     this.root_container.addEventListener( 'pointermove', this.onmove_mouse.bind(this) );
     this.root_container.addEventListener( 'pointerdown', this.ondown_mouse.bind(this) );
     this.root_container.addEventListener( 'pointerup', this.onup_mouse.bind(this) );
@@ -86,7 +95,7 @@ class Renderer {
   }
 
   setup_controls() {
-    this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+    this.controls = new OrbitControls( this.camera, this.renderer_badge.domElement );
 
     this.controls.enableDamping = false;
     this.controls.screenSpacePanning = false;
@@ -103,6 +112,7 @@ class Renderer {
 
   advance() {
     this.renderer.render(this.scene, this.camera);
+    this.renderer_badge.render(this.scene, this.camera);
     this.stats_fps.update();
   }
 

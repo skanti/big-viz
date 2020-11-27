@@ -10,6 +10,7 @@ class PCAObject {
 
   id = "";
   type = "";
+  grid = "";
   n_components = 0;
   mean = [];
   components = [];
@@ -34,7 +35,7 @@ class PCAObject {
 
   parse_from_json(data) {
     // -> check if keys present
-    let keys_required = ["id", "type", "mean", "components", "variances", "dims", "res"];
+    let keys_required = ["id", "type", "mean", "grid", "components", "variances", "dims", "res"];
     for (let k of keys_required) {
       if (!(k in data))
         throw Error(k + " not in data json");
@@ -43,6 +44,7 @@ class PCAObject {
 
     this.id = data["id"];
     this.type = data["type"];
+    this.grid = data["grid"];
     this.mean = math.matrix(data["mean"]);
     this.components = math.matrix(data["components"]);
     this.variances = data["variances"];
@@ -66,19 +68,25 @@ class PCAObject {
 
   calc_points() {
     const c = math.multiply(this.parameters, this.components);
-    let sdf = math.add(this.mean, c);
-    sdf = math.abs(sdf);
-    sdf = math.smallerEq(sdf, this.res);
+    let values = math.add(this.mean, c);
+    values = math.abs(values);
+    if (this.grid == "sdf"){
+      values = math.smallerEq(values, this.res);
+    } else if (this.grid == "occupancy") {
+      values = math.largerEq(values, 0.5);
+    } else {
+      throw Error("Grid type not known.");
+    }
 
 
     let dims = this.dims;
     let n_all = dims[0]*dims[1]*dims[2];
 
-    if (sdf.size() != n_all)
+    if (values.size() != n_all)
         throw Error("Number of points does not match grid dimension");
 
     let points = [];
-    sdf.forEach(function (value, index) {
+    values.forEach(function (value, index) {
       if (value === true) {
         let rem = index;
         const z = math.floor(rem/(dims[0]*dims[1]));
