@@ -91,13 +91,19 @@ class PointObject {
     }
     this.mesh.raw = this;
 
+    let t = new THREE.Vector3();
+    let q = new THREE.Quaternion();
+    let s = new THREE.Vector3();
+    mat.decompose(t,q,s);
+
     const badge = this.badge;
     if (badge) {
-      let badge_div = document.createElement("div_" + badge);
-      badge_div.className = 'q-badge text-bold';
+      let badge_div = document.createElement("div_label_" + this.id);
+      badge_div.className = "q-badge text-bold";
+      badge_div.style.fontSize = "16px";
       badge_div.textContent = badge;
       let css_obj = new CSS2DObject( badge_div );
-      css_obj.position.set( 0, 0, 0 );
+      css_obj.position.set( t.x, t.y, t.z );
       this.mesh.add(css_obj);
     }
 

@@ -27,6 +27,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // -> some extra services
+router.get("/", function(req, res, next) {
+  res.send("alive");
+});
+
 router.get("/timestamp", function(req, res, next) {
 	const timestamp = (new Date()).toString();
 	res.send(timestamp);
