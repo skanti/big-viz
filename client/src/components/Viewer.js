@@ -6,21 +6,19 @@ import * as THREE from "three";
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2.js';
 
-import { mapState } from 'vuex'
-
 
 import Menu from '@/components/Menu.vue';
-import Toolbox from '@/components/Toolbox.vue';
+import PCAToolbox from '@/components/toolboxes/PCAToolbox.vue';
+import AnimationToolbox from '@/components/toolboxes/AnimationToolbox.vue';
 import Renderer from '@/components/Renderer.js';
 import Context from '@/components/Context.js';
 
-import PCAObject from '@/components/objects/PCAObject.js';
-import PointObject from '@/components/objects/PointObject.js';
+import ThreeHelper from '@/components/objects/ThreeHelper.js';
 
 @Component({
   name: "Viewer",
-  components: { Menu, Toolbox },
-  computed: { 
+  components: { Menu, PCAToolbox, AnimationToolbox },
+  computed: {
     search_text: {
       get () {
         return this.$store.state.search_text;
@@ -53,8 +51,8 @@ export default class Viewer extends Vue {
   init() {
     // -> init renderer
     this.renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
-    this.renderer.camera.position.set(3,2,1); 
-    this.renderer.controls.target.set(0,0,0); 
+    this.renderer.camera.position.set(3,2,1);
+    this.renderer.controls.target.set(0,0,0);
     this.renderer.controls.update();
     this.$store.commit("scene", this.renderer.scene);
     // <-
@@ -98,7 +96,7 @@ export default class Viewer extends Vue {
       return;
 
     let survived = [];
-    for (let [i,obj] of Object.entries(children)) {
+    for (let obj of Object.values(children)) {
       let type = obj.type;
       if (type.includes("Light"))
         survived.push(obj);
@@ -109,12 +107,13 @@ export default class Viewer extends Vue {
   }
 
   onclick_save_screenshot() {
-    let img = new Image();
     let src = this.renderer.renderer.domElement.toDataURL();
     let a = document.createElement("a");
     a.href = src.replace("image/png", "image/octet-stream");
     a.download = "canvas_" + (new Date()).toISOString() + ".png";
     a.click();
+  }
+  onclick_animation() {
   }
 
   onclick_screenshot() {
@@ -131,26 +130,6 @@ export default class Viewer extends Vue {
     document.body.removeChild(img);
   }
 
-  add_box_to_scene(data) {
-
-    let color = null;
-    const color_buff = data["color"];
-    if (color_buff) {
-      if (color_buff.length != 3)
-        throw Error("'color' element has to size=3");
-      color = new THREE.Color(color_buff[0], color_buff[1], color_buff[2]);
-    }
-
-    const g = new THREE.BoxBufferGeometry(1, 1, 1);
-    const geometry = new THREE.WireframeGeometry(g);
-    const material = new THREE.LineBasicMaterial({ color: color, linewidth: 5 });
-    const wireframe = new THREE.LineSegments( geometry, material );
-
-    this.apply_trs(wireframe, data["trs"]);
-    this.renderer.upsert_mesh(data["id"], wireframe);
-
-    this.renderer.scene.add(wireframe);
-  }
 
   add_ground_plane_to_scene() {
     let width = 100.0;
@@ -169,66 +148,9 @@ export default class Viewer extends Vue {
     this.renderer.scene.add( helper );
   }
 
-  add_verts_and_faces_to_scene(data) {
-    if (!("verts" in data))
-      throw Error("No 'verts' in data");
-    if (!("faces" in data))
-      throw Error("No 'faces' in data");
-
-    const verts_buff = data["verts"];
-    const faces_buff = data["faces"];
-    const colors_buff = data["colors"];
-
-    let geometry = new THREE.Geometry();
-
-    /*eslint no-unused-vars: "off"*/
-    for (let [i,v] of Object.entries(verts_buff)) {
-      geometry.vertices.push(new THREE.Vector3(v[0], v[1], v[2]));
-    }
-    for (let [i,f] of Object.entries(faces_buff)) {
-      geometry.faces.push(new THREE.Face3(f[0], f[1], f[2]));
-    }
-
-    geometry.computeVertexNormals();
-
-    if (colors_buff) {
-      for (let [i,c] of Object.entries(colors_buff)) {
-        geometry.colors.push(new THREE.Vector3(c[0], c[1], c[2]));
-      }
-    }
-
-    let color = null;
-    let color_buff =  data["color"];
-    if (color_buff) {
-      if (color_buff.length != 3)
-        throw Error("'color' element has to size=3");
-      color = new THREE.Color(color_buff[0], color_buff[1], color_buff[2]);
-    }
-
-    if (!colors_buff && !color_buff)
-      color = new THREE.Color(Math.random(), Math.random(), Math.random());
-
-    let material = new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide });
-    let mesh = new THREE.Mesh( geometry, material );
-    this.apply_trs(mesh, data["trs"]);
-    this.renderer.upsert_mesh(data["id"], mesh);
-  }
 
 
-  add_points_to_scene(data) {
-    let points = new PointObject(this.ctx, this.renderer);
-    points.parse_from_json(data);
-    points.make();
-  }
-
-  add_pca_grid_to_scene(data) {
-
-    let pca = new PCAObject(this.ctx, this.renderer);
-    pca.parse_from_json(data);
-    pca.make();
-  }
-
-  add_ply_to_scene(id, buffer) {
+  parse_ply_and_add_to_scene(id, buffer) {
     const loader = new PLYLoader();
     const geometry = loader.parse(buffer);
     geometry.computeVertexNormals();
@@ -254,6 +176,11 @@ export default class Viewer extends Vue {
     this.renderer.upsert_mesh(id, mesh);
   }
 
+  parse_json_and_add_to_scene(id, buffer) {
+    let data = new TextDecoder().decode(buffer);
+    this.on_ws_data(data);
+  }
+
 
   apply_trs(mesh, trs) {
     let mat = this.compose_mat4(trs);
@@ -272,6 +199,7 @@ export default class Viewer extends Vue {
       return;
     }
 
+
     let obj = null;
     for (let v of Object.values(this.renderer.scene.children)) {
       const is_match = v["name"] === id;
@@ -281,12 +209,18 @@ export default class Viewer extends Vue {
       }
     }
 
+
     if (obj === null)
       return;
 
     if (obj.type == "pca_grid") {
-      this.toolbox = Toolbox;
+      this.toolbox = PCAToolbox;
       this.toolbox_props = {  variances: obj.variances };
+    }
+
+    if (obj.type == "animation") {
+      this.toolbox = AnimationToolbox;
+      this.toolbox_props = { id: obj.id };
     }
   }
 
@@ -306,45 +240,45 @@ export default class Viewer extends Vue {
     data = JSON.parse(data);
     let type = data["type"];
 
-		let accepted_types = new Set(["ply", "points", "box", "pca_grid"]);
+    let accepted_types = new Set(["animation", "ply", "points", "box", "pca_grid"]);
     if (!accepted_types.has(type)) {
       console.log("Warning: Received data has unknown type. Type: ", type);
       return
     }
 
     try {
-      if (type === "ply")
-        this.add_verts_and_faces_to_scene(data);
-      else if (type === "points")
-        this.add_points_to_scene(data);
-      else if (type === "box")
-        this.add_box_to_scene(data);
-      else if (type === "pca_grid")
-        this.add_pca_grid_to_scene(data);
-
+      let mesh = ThreeHelper.make_mesh_from_type(this.ctx, data);
+      this.renderer.upsert_mesh(data["id"], mesh);
       this.ctx.event_bus.$emit("new_object");
     } catch (err){
       console.log(err);
     }
+
   }
+
 
   on_grab_data(filename, data) {
     try {
       let suffix = filename.split('.').pop();
       let id = path.basename(path.dirname(filename)) + path.basename(filename);
-      const mesh_types = new Set(["ply", "obj"]);
+      const ply_types = new Set(["ply" ]);
+      const obj_types = new Set(["obj"]);
       const vox_types = new Set(["vox", "svox", "svoxrgb"]);
+      //const pkl_types = new Set(["pickle", "pkl"]);
+      const json_types = new Set(["json"]);
 
-      const accepted_types = new Set([...mesh_types, ...vox_types]);
+      const accepted_types = new Set([...ply_types, ...obj_types, ...vox_types, ...json_types]);
       console.log(filename, accepted_types);
       if (!accepted_types.has(suffix)) {
         throw "Warning: Received data has unknown suffix: " + suffix;
       }
 
-      if (suffix === "ply")
-        this.add_ply_to_scene(id, data);
-      else if (suffix === "obj")
-        this.add_obj_to_scene(id, data);
+      if (ply_types.has(suffix))
+        this.parse_ply_and_add_to_scene(id, data);
+      else if (obj_types.has(suffix))
+        this.parse_obj_and_add_to_scene(id, data);
+      else if (json_types.has(suffix))
+        this.parse_json_and_add_to_scene(id, data);
 
       this.ctx.event_bus.$emit("new_object");
     } catch (err){

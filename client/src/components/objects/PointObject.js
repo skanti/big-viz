@@ -1,7 +1,6 @@
 import * as THREE from "three";
 
 import { CSS2DObject } from "three/examples/jsm/renderers/CSS2DRenderer.js";
-
 import MathHelpers from '@/components/MathHelpers.js';
 
 class PointObject {
@@ -22,14 +21,12 @@ class PointObject {
   material = null;
   mesh = null;
 
-  constructor(ctx, renderer) {
+  constructor(ctx) {
     this.ctx = ctx;
-    this.renderer = renderer;
-
-    this.ctx.event_bus.$on("pca", this.on_change_parameters.bind(this));
+    //this.ctx.event_bus.$on("pca", this.on_change_parameters.bind(this));
   }
 
-  parse_from_json(data) {
+  extract(data) {
     // -> check if keys present
     let keys_required = ["id", "type", "positions", "res"];
     for (let k of keys_required) {
@@ -61,11 +58,12 @@ class PointObject {
     }
   }
 
-  make() {
-    this.make_mesh();
+  make(data) {
+    this.extract(data);
+    this.create_mesh();
   }
 
-  make_mesh() {
+  create_mesh() {
     const res = this.res;
     const color = this.color;
     this.geometry = new THREE.BoxBufferGeometry(res, res, res);
@@ -107,12 +105,6 @@ class PointObject {
       this.mesh.add(css_obj);
     }
 
-    this.renderer.upsert_mesh(this.id, this.mesh);
-  }
-
-  on_change_parameters(data) {
-    this.parameters = data["params"]
-    this.make();
   }
 
 }
