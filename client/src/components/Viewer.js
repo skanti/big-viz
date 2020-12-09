@@ -292,7 +292,7 @@ export default class Viewer extends Vue {
     axios.get(path_data, { responseType: 'arraybuffer' }).then(res => {
       this.on_grab_data(this.search_text, res.data);
     }).catch(err => {
-      console.log("error", err);
+      this.$q.notify({ message: err.message, caption: "Error", color: "red-5" })
     });
   }
 
