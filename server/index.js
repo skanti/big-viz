@@ -32,18 +32,18 @@ router.get("/", function(req, res, next) {
 });
 
 router.get("/timestamp", function(req, res, next) {
-	const timestamp = (new Date()).toString();
-	res.send(timestamp);
+  const timestamp = (new Date()).toString();
+  res.send(timestamp);
 });
 
 // -> data serving api
 router.use((req, res, next) => {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-	res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.setHeader('Access-Control-Allow-Credentials', true);
 
-	next();
+  next();
 })
 
 function search_and_find_file(filename) {
@@ -51,18 +51,18 @@ function search_and_find_file(filename) {
     let file = path.join(__dirname, "/static/home/", filename);
     if (fs.existsSync(file))
       resolve(file)
-      else 
+    else
       reject(new Error("No file found"));
-    });
-  }
+  });
+}
 
 router.get("/data/*", function(req, res, next) {
   const filename = req.params["0"];
   search_and_find_file(filename).then(file => {
-      res.sendFile(file)
-    }).catch(err => {
-      res.status(500).send({ msg: err.message })
-    });
+    res.sendFile(file)
+  }).catch(err => {
+    res.status(500).send({ msg: err.message })
+  });
 });
 // <-
 
@@ -76,27 +76,27 @@ const url = process.env.URL_SERVER;
 const handle = http.createServer(app);
 
 handle.listen({"port" : port, "host" : hostname}, () => {
-	console.log(`Server running at ${url}`);
+  console.log(`Server running at ${url}`);
 });
 
 let ws_handle = io(process.env.PORT_WEBSOCKET, { origins: '*:*'});
 ws_handle.on('connection', socket => {
-	console.log(`A user connected with socket id ${socket.id}`)
+  console.log(`A user connected with socket id ${socket.id}`)
 
-	socket.emit('user', socket.id)
+  socket.emit('user', socket.id)
 
-	socket.on('disconnect', () => {
-		socket.broadcast.emit('user-disconnected', socket.id)
-	})
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('user-disconnected', socket.id)
+  })
 
-	socket.on('nudge-client', data => {
-		socket.broadcast.to(data.to).emit('client-nudged', data)
-	})
+  socket.on('nudge-client', data => {
+    socket.broadcast.to(data.to).emit('client-nudged', data)
+  })
 
   socket.on('data', data => {
     data = decodeURIComponent(escape(data));
     socket.emit("ok");
     socket.broadcast.emit("data", data);
-	})
+  })
 })
 

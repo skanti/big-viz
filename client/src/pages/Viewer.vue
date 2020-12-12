@@ -1,16 +1,5 @@
-<template> <q-page> <div v-if="mode==='loading'" class="q-gutter-md fixed-center text-center">
-      <q-spinner-grid color="primary" size="xl">  </q-spinner-grid>
-      <div>
-        <q-badge> {{this.mode_msg}} </q-badge>
-      </div>
-    </div>
-
-    <div v-if="mode==='error'" class="q-gutter-md fixed-center text-center">
-      <i class="text-negative fas fa-exclamation-triangle" style="font-size:3rem"></i>
-      <div>
-        <q-badge color="negative"> {{this.mode_msg}} </q-badge>
-      </div>
-    </div>
+<template>
+  <q-page>
 
     <!-- search bar -->
     <div class="row q-pa-sm" id="div_menu_bar">
@@ -32,6 +21,10 @@
     <div class="row q-pa-sm" id="div_status_bar">
       <div class="flex items-center q-col-gutter-md" style="width:100%">
         <div class="q-gutter-sm">
+          <q-btn :loading="loading" color="primary" >
+            Status: <q-icon name="fas fa-check-circle"/>
+            <template v-slot:loading> <q-spinner-hourglass class="on-left" /> Loading...  </template>
+          </q-btn>
           <q-btn @click="onclick_screenshot" label="Screenshot" class="text-bold" color="blue-5" icon="fas fa-camera" >  </q-btn>
           <q-btn @click="onclick_save_screenshot" label="Save Screenshot" class="text-bold" color="blue-5" icon="fas fa-download" >  </q-btn>
           <q-btn @click="onclick_clear_canvas" label="Clear Canvas" class="text-bold" color="red-5" icon="fas fa-times" >  </q-btn>

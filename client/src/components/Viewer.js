@@ -35,9 +35,7 @@ export default class Viewer extends Vue {
   data() {
     return {
       ctx: new Context(),
-      mode: "loading",
-      mode_msg: "Loading...",
-      status: "OK",
+      loading: false,
       is_active: false,
       mesh_bbox: null,
       raycaster: new THREE.Raycaster(),
@@ -49,6 +47,8 @@ export default class Viewer extends Vue {
   }
 
   init() {
+    this.loading = true;
+
     // -> init renderer
     this.renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
     this.renderer.camera.position.set(3,2,1);
@@ -71,13 +71,17 @@ export default class Viewer extends Vue {
     this.$socket.$subscribe('data', this.on_ws_data.bind(this));
     // <-
 
-    this.mode = "ok";
     this.is_active = true;
 
     // -> run animation loop
     this.advance_ref = this.advance.bind(this);
     this.advance();
     // <-
+
+    setTimeout(() => {
+      this.loading = false;
+    }, 2000);
+
   }
 
   mounted() {
@@ -256,43 +260,42 @@ export default class Viewer extends Vue {
 
   }
 
-
   on_grab_data(filename, data) {
-    try {
-      let suffix = filename.split('.').pop();
-      let id = path.basename(path.dirname(filename)) + path.basename(filename);
-      const ply_types = new Set(["ply" ]);
-      const obj_types = new Set(["obj"]);
-      const vox_types = new Set(["vox", "svox", "svoxrgb"]);
-      //const pkl_types = new Set(["pickle", "pkl"]);
-      const json_types = new Set(["json"]);
+    let suffix = filename.split('.').pop();
+    let id = path.basename(path.dirname(filename)) + path.basename(filename);
+    const ply_types = new Set(["ply" ]);
+    const obj_types = new Set(["obj"]);
+    const vox_types = new Set(["vox", "svox", "svoxrgb"]);
+    //const pkl_types = new Set(["pickle", "pkl"]);
+    const json_types = new Set(["json"]);
 
-      const accepted_types = new Set([...ply_types, ...obj_types, ...vox_types, ...json_types]);
-      console.log(filename, accepted_types);
-      if (!accepted_types.has(suffix)) {
-        throw "Warning: Received data has unknown suffix: " + suffix;
-      }
-
-      if (ply_types.has(suffix))
-        this.parse_ply_and_add_to_scene(id, data);
-      else if (obj_types.has(suffix))
-        this.parse_obj_and_add_to_scene(id, data);
-      else if (json_types.has(suffix))
-        this.parse_json_and_add_to_scene(id, data);
-
-      this.ctx.event_bus.$emit("new_object");
-    } catch (err){
-      console.log(err);
+    const accepted_types = new Set([...ply_types, ...obj_types, ...vox_types, ...json_types]);
+    console.log(filename, accepted_types);
+    if (!accepted_types.has(suffix)) {
+      throw "Warning: Received data has unknown suffix: " + suffix;
     }
+
+    if (ply_types.has(suffix))
+      this.parse_ply_and_add_to_scene(id, data);
+    else if (obj_types.has(suffix))
+      this.parse_obj_and_add_to_scene(id, data);
+    else if (json_types.has(suffix))
+      this.parse_json_and_add_to_scene(id, data);
+
+    this.ctx.event_bus.$emit("new_object");
   }
 
 
   onclick_grab() {
+    this.loading = true;
     const path_data = process.env.VUE_APP_URL_SERVER + "/data/" + this.search_text;
     axios.get(path_data, { responseType: 'arraybuffer' }).then(res => {
       this.on_grab_data(this.search_text, res.data);
     }).catch(err => {
+      console.log(err);
       this.$q.notify({ message: err.message, caption: "Error", color: "red-5" })
+    }).finally( () => {
+      this.loading = false;
     });
   }
 
