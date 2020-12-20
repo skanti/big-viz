@@ -186,12 +186,6 @@ export default class Viewer extends Vue {
   }
 
 
-  apply_trs(mesh, trs) {
-    let mat = this.compose_mat4(trs);
-    mesh.applyMatrix4(mat);
-  }
-
-
   onclick_mouse(event) {
     this.onclick_instance(event);
   }
@@ -242,14 +236,6 @@ export default class Viewer extends Vue {
 
   on_ws_data(data) {
     data = JSON.parse(data);
-    let type = data["type"];
-
-    let accepted_types = new Set(["animation", "ply", "points", "box", "pca_grid"]);
-    if (!accepted_types.has(type)) {
-      console.log("Warning: Received data has unknown type. Type: ", type);
-      return
-    }
-
     try {
       let mesh = ThreeHelper.make_mesh_from_type(this.ctx, data);
       this.renderer.upsert_mesh(data["id"], mesh);
@@ -270,7 +256,6 @@ export default class Viewer extends Vue {
     const json_types = new Set(["json"]);
 
     const accepted_types = new Set([...ply_types, ...obj_types, ...vox_types, ...json_types]);
-    console.log(filename, accepted_types);
     if (!accepted_types.has(suffix)) {
       throw "Warning: Received data has unknown suffix: " + suffix;
     }
