@@ -1,15 +1,8 @@
 <template>
 
   <div >
-    <q-table
-      title="Objects"
-      :data="rows"
-      :columns="columns"
-      row-key="id"
-      selection="single"
-      :pagination="pagination"
-      @row-click="onclick_row"
-      >
+    <q-table title="Objects" :data="rows" :columns="columns" row-key="id"
+      selection="single" :pagination="pagination" @row-click="onclick_row" >
       <template v-slot:top-left>
         <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:prepend>
@@ -30,13 +23,13 @@
 
       <template v-slot:body="props">
         <q-tr class="cursor-pointer"
-              :class="props.row.id ==  id_selected ? 'bg-primary' : 'bg-grey-1'"
-              :props="props" @click="onclick_row(props.row)">
+          :class="props.row.id ==  id_selected ? 'bg-primary' : 'bg-grey-1'"
+          :props="props" @click="onclick_row(props.row)">
           <q-td auto-width>
             <q-btn size="sm"
-                   color="dark"
-                   @click="e => toggle_visibility(e, props.row)"
-                   :icon="props.row.visible ? 'fas fa-eye' : 'fas fa-eye-slash'" round />
+              color="dark"
+              @click="e => toggle_visibility(e, props.row)"
+              :icon="props.row.visible ? 'fas fa-eye' : 'fas fa-eye-slash'" round />
           </q-td>
           <q-td v-for="col in props.cols" :key="col.name" :props="props" >
             <q-badge color="blue"> {{ col.value }}</q-badge>
@@ -97,7 +90,6 @@ export default {
       return rows;
     },
   }, created () {
-    this.ctx = this.$props.ctx;
     this.ctx.event_bus.$on("new_object", this.add_new_object);
   }, methods : {
     add_new_object: function () {

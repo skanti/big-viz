@@ -79,7 +79,9 @@ handle.listen({"port" : port, "host" : hostname}, () => {
   console.log(`Server running at ${url}`);
 });
 
-let ws_handle = io(process.env.PORT_WEBSOCKET, { origins: '*:*'});
+
+let ws_handle = io(process.env.PORT_WEBSOCKET, { cors: { origin: '*', }, maxHttpBufferSize: 1e8 });
+
 ws_handle.on('connection', socket => {
   console.log(`A user connected with socket id ${socket.id}`)
 
