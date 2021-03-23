@@ -50,7 +50,6 @@ export default class Viewer extends Vue {
     this.loading = true;
 
     // -> init renderer
-    console.log('div', this.$refs);
     this.renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
     this.renderer.camera.position.set(3,2,1);
     this.renderer.controls.target.set(0,0,0);
