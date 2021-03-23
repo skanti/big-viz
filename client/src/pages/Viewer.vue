@@ -24,17 +24,17 @@
     <div class='row q-pa-sm' id='div_status_bar'>
       <div class='flex items-center q-col-gutter-md' style='width:100%'>
         <div class='q-gutter-sm'>
-          <q-btn color='primary' >
+          <q-btn class='text-bold' color='primary' dense>
             <div v-if='loading'>
               <div> Loading...  <q-spinner class='on-right' /> </div>
             </div>
             <div v-else>
-              Status: <q-icon class='q-ml-sm' name='fas fa-check-circle'/>
+              Status <q-icon class='on-right' name='fas fa-check-circle'/>
             </div>
           </q-btn>
-          <q-btn @click='onclick_screenshot' label='Screenshot' class='text-bold' color='blue-5' icon='fas fa-camera' dense />
-          <q-btn @click='onclick_save_screenshot' label='Save Screenshot' class='text-bold' color='blue-5' icon='fas fa-download' dense />
-          <q-btn @click='onclick_clear_canvas' label='Clear Canvas' class='text-bold' color='red-5' icon='fas fa-times' dense />
+          <q-btn @click='onclick_screenshot' label='Screenshot' class='text-bold' color='blue-5' icon-right='fas fa-camera' dense />
+          <q-btn @click='onclick_save_screenshot' label='Save Screenshot' class='text-bold' color='blue-5' icon-right='fas fa-download' dense />
+          <q-btn @click='onclick_clear_canvas' label='Clear Canvas' class='text-bold' color='red-5' icon-right='fas fa-times' dense />
         </div>
       </div>
     </div>
