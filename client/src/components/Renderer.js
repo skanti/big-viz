@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 
 class Renderer {
   constructor(ctx, div_root, tag) {

@@ -4,7 +4,7 @@ import axios from 'axios';
 import path from 'path';
 import * as THREE from "three";
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
-import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 
 
 import Menu from '@/components/Menu.vue';
@@ -50,6 +50,7 @@ export default class Viewer extends Vue {
     this.loading = true;
 
     // -> init renderer
+    console.log('div', this.$refs);
     this.renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
     this.renderer.camera.position.set(3,2,1);
     this.renderer.controls.target.set(0,0,0);
@@ -166,7 +167,7 @@ export default class Viewer extends Vue {
   }
 
   add_obj_to_scene(id, buffer) {
-    const loader = new OBJLoader2();
+    const loader = new OBJLoader();
     const mesh = loader.parse(buffer);
     let color = new THREE.Color("rgb(250, 250, 150)");
     const material = new THREE.MeshLambertMaterial( { color: color, side: THREE.DoubleSide});

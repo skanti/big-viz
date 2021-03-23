@@ -1,49 +1,47 @@
 {
-  "name": "big-viz",
-  "version": "0.1.0",
+  "name": "big-viz-client",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "dev": "vue-cli-service serve"
+    "dev": "vue-cli-service serve --modern",
+    "build": "vue-cli-service build --modern --watch",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@quasar/extras": "^1.9.13",
+    "@quasar/extras": "^1.9.20",
     "axios": "^0.21.1",
-    "core-js": "^3.8.2",
-    "google-protobuf": "^3.14.0",
+    "core-js": "^3.9.1",
+    "google-protobuf": "^3.15.6",
     "jpeg-js": "^0.4.3",
-    "mathjs": "^9.0.0",
-    "nanoevents": "^5.1.10",
+    "mathjs": "^9.3.0",
+    "nanoevents": "^5.1.13",
     "path": "^0.12.7",
-    "quasar": "^1.15.0",
-    "socket.io-client": "^3.1.0",
-    "three": "^0.124.0",
+    "quasar": "^1.15.7",
+    "sass-loader": "^10.1.1",
+    "socket.io-client": "^4.0.0",
+    "three": "^0.126.1",
     "vue": "^2.6.12",
     "vue-class-component": "^7.2.6",
-    "vue-router": "^3.4.9",
-    "vue-socket.io-extended": "^4.0.6",
-    "vuex": "^3.6.0",
-    "vuex-persistedstate": "^3.2.0"
+    "vue-router": "^3.5.1",
+    "vue-socket.io-extended": "^4.0.8",
+    "vuex": "^3.6.2",
+    "vuex-persistedstate": "^4.0.0-beta.3"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-proposal-decorators": "^7.12.12",
-    "@vue/cli-plugin-babel": "~4.5.10",
-    "@vue/cli-plugin-eslint": "~4.5.10",
-    "@vue/cli-service": "~4.5.10",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-proposal-decorators": "^7.13.5",
+    "@vue/cli-plugin-babel": "^4.5.12",
+    "@vue/cli-plugin-eslint": "^4.5.12",
+    "@vue/cli-service": "^4.5.12",
     "babel-eslint": "^10.1.0",
     "babel-plugin-transform-imports": "2.0.0",
-    "eslint": "^7.18.0",
-    "eslint-plugin-vue": "^7.4.1",
+    "eslint": "^7.22.0",
+    "eslint-plugin-vue": "^7.8.0",
     "node-sass": "^5.0.0",
-    "sass-loader": "^10.1.1",
     "vue-cli-plugin-quasar": "~3.0.1",
     "vue-template-compiler": "^2.6.12"
   },
   "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
+    "since 2015"
   ]
 }
