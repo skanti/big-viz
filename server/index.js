@@ -94,7 +94,7 @@ server.listen({'port' : port, 'host' : hostname}, () => {
   console.log(`Server running at ${url}`);
 
 
-  let ws_handle = io(server, { cors: { origin: '*', }, maxHttpBufferSize: 1e8 });
+  let ws_handle = io(server, { cors: { origin: '*', }, maxHttpBufferSize: 1e9 });
 
   ws_handle.on('connection', socket => {
     console.log(`A user connected with socket id ${socket.id}`)
@@ -105,10 +105,16 @@ server.listen({'port' : port, 'host' : hostname}, () => {
       socket.broadcast.emit('user-disconnected', socket.id)
     })
 
-    socket.on('data', data => {
+    socket.on('upsert', data => {
       data = decodeURIComponent(escape(data));
       socket.emit('ok');
-      socket.broadcast.emit('data', data);
+      socket.broadcast.emit('upsert', data);
+    })
+
+    socket.on('update', data => {
+      data = decodeURIComponent(escape(data));
+      socket.emit('ok');
+      socket.broadcast.emit('update', data);
     })
   })
 

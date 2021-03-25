@@ -77,10 +77,9 @@ class PlyObject {
     this.mesh.raw = this;
 
     let mat = MathHelpers.compose_mat4(this.trs);
-    let t = new THREE.Vector3();
-    let q = new THREE.Quaternion();
-    let s = new THREE.Vector3();
-    mat.decompose(t,q,s);
+    this.mesh.matrixAutoUpdate = false;
+    this.mesh.matrix.copy(mat);
+    this.mesh.updateMatrixWorld(true);
   }
 
 }

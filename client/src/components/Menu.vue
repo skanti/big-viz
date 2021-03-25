@@ -59,7 +59,7 @@ export default {
 
       pagination: {
         page: 1,
-        rowsPerPage: 20
+        rowsPerPage: 10
       },
     }
   }, computed: {

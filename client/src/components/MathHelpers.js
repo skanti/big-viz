@@ -1,33 +1,45 @@
 import * as THREE from "three";
 
 const compose_mat4 = function(trs) {
-  let trans = new THREE.Vector3(0, 0, 0);
+    let trans = new THREE.Vector3(0, 0, 0);
   let rot = new THREE.Quaternion(0, 0, 0, 1);
   let scale = new THREE.Vector3(1, 1, 1);
   let mat = new THREE.Matrix4();
   mat.compose(trans, rot, scale);
-
   if (trs == null)
     return mat;
 
-  if ("translation" in trs)
-    trans = new THREE.Vector3(trs["translation"][0], trs["translation"][1], trs["translation"][2]);
-  if ("t" in trs)
-    trans = new THREE.Vector3(trs["t"][0], trs["t"][1], trs["t"][2]);
+  if (trs.constructor === Object) {
 
-  if ("rotation" in trs)
-    rot = new THREE.Quaternion(trs["rotation"][1], trs["rotation"][2], trs["rotation"][3], trs["rotation"][0]);
-  if ("q" in trs)
-    rot = new THREE.Quaternion(trs["q"][1], trs["q"][2], trs["q"][3], trs["q"][0]);
+    if ("t" in trs) {
+      let t = trs["t"];
+      if (t.length != 3)
+        throw Error("Translation 't' in 'trs' has invalid size");
+      trans = new THREE.Vector3(t[0], t[1], t[2]);
+    }
 
-  if ("scale" in trs)
-    scale = new THREE.Vector3(trs["scale"][0], trs["scale"][1], trs["scale"][2]);
+    if ("q" in trs) {
+      let q = trs["q"];
+      if (q.length != 4)
+        throw Error("Quaternion 'q' in 'trs' has invalid size");
+      rot = new THREE.Quaternion(q[1], q[2], q[3], q[0]);
+    }
 
-  if ("s" in trs)
-    scale = new THREE.Vector3(trs["s"][0], trs["s"][1], trs["s"][2]);
+    if ("s" in trs) {
+      let s = trs["s"];
+      if (s.length != 3)
+        throw Error("Translation 's' in 'trs' has invalid size");
+      scale = new THREE.Vector3(s[0], s[1], s[2]);
+    }
 
-  mat.compose(trans, rot, scale);
-  return mat
+    mat.compose(trans, rot, scale);
+    return mat
+  } else if (Array.isArray(trs)) {
+    if (trs.length != 16)
+      throw Error("Transformation 'trs' has invalid size");
+    mat = new THREE.Matrix4().fromArray(trs);
+    return mat;
+  }
 
 }
 

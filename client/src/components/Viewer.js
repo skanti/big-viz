@@ -51,7 +51,7 @@ export default class Viewer extends Vue {
 
     // -> init renderer
     this.renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
-    this.renderer.camera.position.set(3,2,1);
+    this.renderer.camera.position.set(5,5,2);
     this.renderer.controls.target.set(0,0,0);
     this.renderer.controls.update();
     this.$store.commit("scene", this.renderer.scene);
@@ -68,7 +68,8 @@ export default class Viewer extends Vue {
 
     // -> add listener
     this.$socket.$subscribe('user', id_socket => console.log("id_socket", id_socket));
-    this.$socket.$subscribe('data', this.on_ws_data.bind(this));
+    this.$socket.$subscribe('upsert', this.on_ws_upsert.bind(this));
+    this.$socket.$subscribe('update', this.on_ws_update.bind(this));
     // <-
 
     this.is_active = true;
@@ -182,7 +183,7 @@ export default class Viewer extends Vue {
 
   parse_json_and_add_to_scene(id, buffer) {
     let data = new TextDecoder().decode(buffer);
-    this.on_ws_data(data);
+    this.on_ws_upsert(data);
   }
 
 
@@ -233,8 +234,19 @@ export default class Viewer extends Vue {
       this.ctx.event_bus.$emit("instance_selected", this.id_raycast);
     }
   }
+  on_ws_update(data) {
+    data = JSON.parse(data);
+    try {
+      //this.toolbox = AnimationToolbox;
+      //this.toolbox_props = { id: "abc" };
+      this.renderer.update_mesh(data);
+      this.ctx.event_bus.$emit("updated_object");
+    } catch (err){
+      console.log(err);
+    }
+  }
 
-  on_ws_data(data) {
+  on_ws_upsert(data) {
     data = JSON.parse(data);
     try {
       let mesh = ThreeHelper.make_mesh_from_type(this.ctx, data);
