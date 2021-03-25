@@ -75,6 +75,7 @@ class PlyObject {
     this.mesh = new THREE.Mesh( this.geometry, this.material );
 
     this.mesh.raw = this;
+    this.mesh.name = this.id;
 
     let mat = MathHelpers.compose_mat4(this.trs);
     this.mesh.matrixAutoUpdate = false;

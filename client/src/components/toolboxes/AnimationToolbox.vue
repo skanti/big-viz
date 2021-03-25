@@ -2,7 +2,7 @@
   <q-card class="bg-primary text-white q-mt-sm">
     <q-card-section>
       <div class="text-h6">Toolbox</div>
-      <div class="text-subtitle2">Animation</div>
+      <div class="text-subtitle2">Animation: {{ id }}</div>
     </q-card-section>
 
     <q-card-section>
@@ -34,12 +34,15 @@ export default {
   props: [ 'ctx', 'id' ],
   data() {
     return {
-      delay: 200,
+      delay: 10,
     };
-  }, created () {
-  }, methods : {
+  },
+  created () {
+  },
+  methods : {
     click_play: function() {
-      this.ctx.event_bus.$emit("play_" + this.id, { delay: this.delay } );
+      let evt = "play_" + this.id;
+      this.ctx.event_bus.$emit(evt, { delay: this.delay } );
     }
   }
 }

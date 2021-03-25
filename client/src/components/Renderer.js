@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import MathHelpers from '@/components/MathHelpers.js';
 
 class Renderer {
   constructor(ctx, div_root, tag) {
@@ -25,6 +24,7 @@ class Renderer {
     this.setup_controls();
     // <-
     this.is_initialized = true;
+    this.ctx.renderer = this;
   }
 
 
@@ -108,40 +108,19 @@ class Renderer {
     this.stats_fps.update();
   }
 
-  upsert_mesh(id, mesh) {
-    for (let v of Object.values(this.scene.children)) {
-      const is_match = v["name"] === id;
-      if (is_match) {
-        this.scene.remove(v);
-        break;
-      }
+  upsert_mesh(mesh) {
+    let name = mesh.name;
+    if (!name)
+      throw Error("Mesh does not have a name or name is 0", mesh);
+
+    let mesh_old = this.scene.getObjectByName(name, true );
+    if (mesh_old) {
+      this.scene.remove(mesh_old);
     }
-    mesh.name = id;
+
     this.scene.add(mesh);
   }
 
-  update_mesh(data) {
-    let {id} = data;
-
-    let mesh = null;
-    for (let v of Object.values(this.scene.children)) {
-      const is_match = v["name"] === id;
-      if (is_match) {
-        mesh = v;
-        break;
-      }
-    }
-
-    if (!mesh)
-      return;
-
-    let { trs } = data;
-    if (trs) {
-      let mat = MathHelpers.compose_mat4(trs);
-      mesh.matrix.copy(mat);
-      mesh.updateMatrixWorld(true);
-    }
-  }
 }
 
 export default Renderer;

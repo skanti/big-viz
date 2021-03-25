@@ -6,7 +6,7 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import PCAObject from '@/components/objects/PCAObject.js';
 import PointObject from '@/components/objects/PointObject.js';
 import PlyObject from '@/components/objects/PlyObject.js';
-import AnimationObject from '@/components/objects/AnimationObject.js';
+import AnimationMotion from '@/components/AnimationMotion.js';
 import MathHelpers from '@/components/MathHelpers.js';
 
 function make_verts_and_faces_mesh(ctx, data) {
@@ -21,10 +21,40 @@ function make_points_mesh(ctx, data) {
   return points.mesh;
 }
 
-function make_animation_mesh(ctx, data) {
-  let obj = new AnimationObject(ctx);
+function make_animation(ctx, data) {
+  console.log("animation");
+  let { objects } = data;
+  let meshes = [];
+  if (objects) {
+    objects.forEach(obj => {
+      let m = make_mesh_from_type(ctx, obj);
+      meshes.push(m);
+    });
+  }
+  let obj = new AnimationMotion(ctx);
   obj.make(data);
-  return obj.group;
+  ctx.event_bus.$emit("new_animation", data)
+  return meshes;
+}
+
+function find_and_make_update(ctx, update) {
+  let { id } = update;
+  if (!id)
+    throw Error("Id not defined");
+
+  let mesh = ctx.renderer.scene.getObjectByName(id, true );
+  if (!mesh) {
+    console.log("No mesh found with id:" + id);
+    return
+  }
+
+  let {trs} = update;
+  if (trs) {
+    let mat = MathHelpers.compose_mat4(trs);
+    mesh.matrixAutoUpdate = false;
+    mesh.matrix.copy(mat);
+    mesh.updateMatrixWorld(true);
+  }
 }
 
 function make_pca_grid_mesh(ctx, data) {
@@ -111,10 +141,10 @@ function make_mesh_from_type(ctx, data) {
   else if (type === "pca_grid")
     return make_pca_grid_mesh(ctx, data);
   else if (type === "animation")
-    return make_animation_mesh(ctx, data);
+    return make_animation(ctx, data);
   else if (type === "group")
     return make_group_mesh(ctx, data);
 }
 
 export default {make_mesh_from_type, make_points_mesh, make_box_mesh, make_pca_grid_mesh,
-  make_verts_and_faces_mesh, make_animation_mesh};
+  make_verts_and_faces_mesh, make_animation, find_and_make_update};

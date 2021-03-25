@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import ThreeHelper from '@/components/objects/ThreeHelper.js';
 
 class AnimationMotion {
@@ -14,17 +13,19 @@ class AnimationMotion {
 
   extract(data) {
     // -> check if keys present
-    let keys_required = ["type", "frames"];
+    let keys_required = ["id", "type", "frames"];
     for (let k of keys_required) {
       if (!(k in data))
         throw Error(k + " not in data json");
     }
     // <-
 
+    this.id = data["id"];
     this.type = data["type"];
-    this.frames = frames;
+    this.frames = data["frames"];
 
-    this.ctx.event_bus.$on("play_" + this.id, this.play.bind(this));
+    let evt = "play_" + this.id;
+    this.ctx.event_bus.$on(evt, this.play.bind(this));
   }
 
   make(data) {
@@ -32,21 +33,17 @@ class AnimationMotion {
   }
 
   async play(params) {
+    console.log("play");
     let delay = params["delay"];
 
     let frames_num = this.frames.length;
-    let meshes = params["children"];
-
     const timer = ms => new Promise(res => setTimeout(res, ms))
 
     for (let i = 0; i < frames_num; i++) {
       for (let update of this.frames[i]) {
-        await timer(delay);
-        console.log(update);
-        //let mat = MathHelpers.compose_mat4(trs);
-        //mesh.matrix.copy(mat);
-        //mesh.updateMatrixWorld(true);
+        ThreeHelper.find_and_make_update(this.ctx, update);
       }
+      await timer(delay);
     }
 
 

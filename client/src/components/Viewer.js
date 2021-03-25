@@ -60,6 +60,7 @@ export default class Viewer extends Vue {
     // -> set listeners
     this.ctx.event_bus.$on("onclick_mouse_renderer", this.onclick_mouse.bind(this));
     this.ctx.event_bus.$on("selected", this.onclick_selected.bind(this));
+    this.ctx.event_bus.$on("new_animation", this.on_new_animation.bind(this));
     // <-
 
     // -> trigger
@@ -163,7 +164,7 @@ export default class Viewer extends Vue {
     const material = new THREE.MeshLambertMaterial( { color: color, side: THREE.DoubleSide});
     const mesh = new THREE.Mesh( geometry, material );
 
-    this.renderer.upsert_mesh(id, mesh);
+    this.renderer.upsert_mesh(mesh);
   }
 
   add_obj_to_scene(id, buffer) {
@@ -178,7 +179,7 @@ export default class Viewer extends Vue {
       }
     });
 
-    this.renderer.upsert_mesh(id, mesh);
+    this.renderer.upsert_mesh(mesh);
   }
 
   parse_json_and_add_to_scene(id, buffer) {
@@ -217,10 +218,11 @@ export default class Viewer extends Vue {
       this.toolbox_props = {  variances: obj.variances };
     }
 
-    if (obj.type == "animation") {
-      this.toolbox = AnimationToolbox;
-      this.toolbox_props = { id: obj.id };
-    }
+  }
+
+  on_new_animation(params) {
+    this.toolbox = AnimationToolbox;
+    this.toolbox_props = params;
   }
 
 
@@ -249,8 +251,11 @@ export default class Viewer extends Vue {
   on_ws_upsert(data) {
     data = JSON.parse(data);
     try {
-      let mesh = ThreeHelper.make_mesh_from_type(this.ctx, data);
-      this.renderer.upsert_mesh(data["id"], mesh);
+      let meshes = ThreeHelper.make_mesh_from_type(this.ctx, data);
+      if (!Array.isArray(meshes))
+        meshes = [meshes];
+
+      meshes.forEach(mesh => this.renderer.upsert_mesh(mesh));
       this.ctx.event_bus.$emit("new_object");
     } catch (err){
       console.log(err);
