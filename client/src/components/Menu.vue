@@ -1,45 +1,43 @@
 <template>
+  <q-table title="Objects" :data="rows" :columns="columns" row-key="id"
+    selection="single" :pagination="pagination" @row-click="onclick_row" virtual-scroll
+    :rows-per-page-options="[0]" style="max-height:500px">
+    <template v-slot:top-left>
+      <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
+        <template v-slot:prepend>
+          <q-icon name="fas fa-search" />
+        </template>
+      </q-input>
+    </template>
 
-  <div >
-    <q-table title="Objects" :data="rows" :columns="columns" row-key="id"
-      selection="single" :pagination="pagination" @row-click="onclick_row" >
-      <template v-slot:top-left>
-        <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-          <template v-slot:prepend>
-            <q-icon name="fas fa-search" />
-          </template>
-        </q-input>
-      </template>
 
+    <template v-slot:header="props">
+      <q-tr :props="props">
+        <q-th> Visible </q-th>
+        <q-th v-for="col in props.cols" :key="col.name" :props="props">
+          {{ col.label }}
+        </q-th>
+      </q-tr>
+    </template>
 
-      <template v-slot:header="props">
-        <q-tr :props="props">
-          <q-th> Visible </q-th>
-          <q-th v-for="col in props.cols" :key="col.name" :props="props">
-            {{ col.label }}
-          </q-th>
-        </q-tr>
-      </template>
+    <template v-slot:body="props">
+      <q-tr class="cursor-pointer"
+        :class="props.row.id ==  id_selected ? 'bg-primary' : 'bg-grey-1'"
+        :props="props" @click="onclick_row(props.row)">
+        <q-td auto-width>
+          <q-btn size="sm"
+            color="dark"
+            @click="e => toggle_visibility(e, props.row)"
+            :icon="props.row.visible ? 'fas fa-eye' : 'fas fa-eye-slash'" round />
+        </q-td>
+        <q-td v-for="col in props.cols" :key="col.name" :props="props" >
+          <q-badge color="blue"> {{ col.value }}</q-badge>
+        </q-td>
 
-      <template v-slot:body="props">
-        <q-tr class="cursor-pointer"
-          :class="props.row.id ==  id_selected ? 'bg-primary' : 'bg-grey-1'"
-          :props="props" @click="onclick_row(props.row)">
-          <q-td auto-width>
-            <q-btn size="sm"
-              color="dark"
-              @click="e => toggle_visibility(e, props.row)"
-              :icon="props.row.visible ? 'fas fa-eye' : 'fas fa-eye-slash'" round />
-          </q-td>
-          <q-td v-for="col in props.cols" :key="col.name" :props="props" >
-            <q-badge color="blue"> {{ col.value }}</q-badge>
-          </q-td>
+      </q-tr>
+    </template>
 
-        </q-tr>
-      </template>
-
-    </q-table>
-  </div>
+  </q-table>
 </template>
 
 <script>
@@ -58,8 +56,7 @@ export default {
       ],
 
       pagination: {
-        page: 1,
-        rowsPerPage: 10
+        rowsPerPage: 0
       },
     }
   }, computed: {

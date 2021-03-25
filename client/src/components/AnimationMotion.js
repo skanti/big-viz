@@ -46,6 +46,10 @@ class AnimationMotion {
       await timer(delay);
     }
 
+    for (let reset of this.frames[0]) {
+      ThreeHelper.find_and_make_update(this.ctx, reset);
+    }
+
 
   }
 
