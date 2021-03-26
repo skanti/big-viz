@@ -25,6 +25,7 @@ class AnimationMotion {
     this.frames = data["frames"];
 
     let evt = "play_" + this.id;
+    this.ctx.event_bus.$off(evt);
     this.ctx.event_bus.$on(evt, this.play.bind(this));
   }
 

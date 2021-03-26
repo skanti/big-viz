@@ -39,6 +39,9 @@ class Renderer {
     this.camera.position.x = 0.0;
     this.camera.position.z = 1.0;
 
+    this.axes_helper = new THREE.AxesHelper( 5 );
+    this.scene.add(this.axes_helper);
+
     this.scene.add( new THREE.AmbientLight( 0x555555 ) );
     let light = new THREE.DirectionalLight( 0xffffff, 0.5 );
     light.position.set(0.1,0.1,1);
@@ -110,7 +113,7 @@ class Renderer {
 
   upsert_mesh(mesh) {
     let name = mesh.name;
-    if (!name)
+    if (name !== 0 && !name)
       throw Error("Mesh does not have a name or name is 0", mesh);
 
     let mesh_old = this.scene.getObjectByName(name, true );
