@@ -110,6 +110,7 @@ function make_box_mesh(ctx, data) {
   let trs = data["trs"];
   let mat = MathHelpers.compose_mat4(trs);
   wireframe.applyMatrix4(mat);
+  wireframe.name = data["id"];
   return wireframe;
 }
 

@@ -249,6 +249,7 @@ export default class Viewer extends Vue {
   }
 
   on_ws_upsert(data) {
+    this.toolbox = "";
     data = JSON.parse(data);
     try {
       let meshes = ThreeHelper.make_mesh_from_type(this.ctx, data);

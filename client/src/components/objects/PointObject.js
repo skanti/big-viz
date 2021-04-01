@@ -88,6 +88,7 @@ class PointObject {
       }
     }
     this.mesh.raw = this;
+    this.mesh.name = this.id;
 
     let t = new THREE.Vector3();
     let q = new THREE.Quaternion();
