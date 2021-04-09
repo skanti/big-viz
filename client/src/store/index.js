@@ -2,7 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from "vuex-persistedstate";
 
-const dataState = createPersistedState({ })
+const dataState = createPersistedState({
+  paths: ['search_text', 'settings']
+})
 
 Vue.use(Vuex)
 
