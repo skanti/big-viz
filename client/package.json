@@ -3,8 +3,8 @@
   "version": "1.0.1",
   "private": true,
   "scripts": {
-    "dev": "vue-cli-service serve --modern",
-    "build": "vue-cli-service build --modern --watch",
+    "dev": "vue-cli-service build --modern --watch",
+    "build": "vue-cli-service build --modern",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -18,7 +18,7 @@
     "path": "^0.12.7",
     "quasar": "^1.15.7",
     "sass-loader": "^10.1.1",
-    "socket.io-client": "^4.0.0",
+    "socket.io-client": "^4.0.1",
     "three": "^0.126.1",
     "vue": "^2.6.12",
     "vue-class-component": "^7.2.6",

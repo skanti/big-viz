@@ -34,7 +34,7 @@ export default {
   props: [ 'ctx', 'id' ],
   data() {
     return {
-      delay: 10,
+      delay: 30,
     };
   },
   created () {

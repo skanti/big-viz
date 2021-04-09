@@ -6,6 +6,7 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import PCAObject from '@/components/objects/PCAObject.js';
 import PointObject from '@/components/objects/PointObject.js';
 import PlyObject from '@/components/objects/PlyObject.js';
+import LineObject from '@/components/objects/LineObject.js';
 import AnimationMotion from '@/components/AnimationMotion.js';
 import MathHelpers from '@/components/MathHelpers.js';
 
@@ -21,8 +22,13 @@ function make_points_mesh(ctx, data) {
   return points.mesh;
 }
 
+function make_line_mesh(ctx, data) {
+  let obj = new LineObject();
+  obj.make(data);
+  return obj.mesh;
+}
+
 function make_animation(ctx, data) {
-  console.log("animation");
   let { objects } = data;
   let meshes = [];
   if (objects) {
@@ -75,7 +81,7 @@ function make_box_mesh(ctx, data) {
 
   let width = data["width"];
 
-  const path =  [ // root
+  let path =  [ // root
     // back
     -1,  1, -1,
     -1, -1, -1,
@@ -100,12 +106,12 @@ function make_box_mesh(ctx, data) {
     1,  1, 1,
     1,  1, -1,
   ];
+  path = path.map(x => 0.5*x);
   const geometry = new LineGeometry();
   geometry.setPositions(path);
   const material = new LineMaterial({ color: color, linewidth: width });
   const wireframe = new Line2( geometry, material );
   wireframe.computeLineDistances();
-  wireframe.scale.set( 0.5, 0.5, 0.5 );
 
   let trs = data["trs"];
   let mat = MathHelpers.compose_mat4(trs);
@@ -127,7 +133,7 @@ function make_group_mesh(ctx, data) {
 
 function make_mesh_from_type(ctx, data) {
   let type = data["type"];
-  let accepted_types = new Set(["animation", "group", "ply", "points", "box", "pca_grid"]);
+  let accepted_types = new Set(["animation", "group", "ply", "points", "line", "box", "pca_grid"]);
   if (!accepted_types.has(type)) {
     console.log("Warning: Received data has unknown type. Type: ", type);
     return
@@ -137,6 +143,8 @@ function make_mesh_from_type(ctx, data) {
     return make_verts_and_faces_mesh(ctx, data);
   else if (type === "points")
     return make_points_mesh(ctx, data);
+  else if (type === "line")
+    return make_line_mesh(ctx, data);
   else if (type === "box")
     return make_box_mesh(ctx, data);
   else if (type === "pca_grid")
@@ -147,5 +155,5 @@ function make_mesh_from_type(ctx, data) {
     return make_group_mesh(ctx, data);
 }
 
-export default {make_mesh_from_type, make_points_mesh, make_box_mesh, make_pca_grid_mesh,
+export default {make_mesh_from_type, make_points_mesh, make_line_mesh, make_box_mesh, make_pca_grid_mesh,
   make_verts_and_faces_mesh, make_animation, find_and_make_update};

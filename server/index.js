@@ -106,6 +106,7 @@ server.listen({'port' : port, 'host' : hostname}, () => {
     })
 
     socket.on('upsert', data => {
+      console.log("receiving data");
       data = decodeURIComponent(escape(data));
       socket.emit('ok');
       socket.broadcast.emit('upsert', data);
