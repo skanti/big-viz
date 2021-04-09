@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import axios from 'axios';
 import path from 'path';
+//import { mapState } from 'vuex'
 import * as THREE from "three";
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
@@ -25,6 +26,11 @@ import ThreeHelper from '@/components/objects/ThreeHelper.js';
       },
       set (v) {
         this.$store.commit("search_text", v);
+      },
+    },
+    settings: {
+      get () {
+        return this.$store.state.settings;
       },
     }
   }
@@ -74,6 +80,8 @@ export default class Viewer extends Vue {
     // <-
 
     this.is_active = true;
+
+    this.onclick_up_axis(this.settings.camera_up);
 
     // -> run animation loop
     this.advance_ref = this.advance.bind(this);
@@ -139,15 +147,11 @@ export default class Viewer extends Vue {
 
   add_ground_plane_to_scene() {
     let width = 100.0;
-    //let geometry = new THREE.PlaneBufferGeometry( width, width );
-    //geometry.rotateX(-Math.PI/2);
-    //let material = new THREE.ShadowMaterial( { opacity: 0.2 } );
-    //let plane = new THREE.Mesh( geometry, material );
-    //plane.receiveShadow = true;
-    //this.renderer.scene.add( plane );
 
     let helper = new THREE.GridHelper( width, 100 );
-    helper.rotateX(-Math.PI/2);
+    if (this.settings.camera_up == 'y')
+      helper.rotateX(-Math.PI/2);
+    helper.name = "GridHelper";
     helper.position.z = 0.001;
     helper.material.opacity = 0.25;
     helper.material.transparent = true;
@@ -230,7 +234,7 @@ export default class Viewer extends Vue {
 
     const is_instance = this.id_raycast != -1;
     const is_left_click = event.button == 0;
-    console.log("is_left_click", is_left_click);
+    //console.log("is_left_click", is_left_click);
 
     if (is_instance && is_left_click) {
       this.ctx.event_bus.$emit("instance_selected", this.id_raycast);
@@ -300,6 +304,23 @@ export default class Viewer extends Vue {
     }).finally( () => {
       this.loading = false;
     });
+  }
+  onclick_up_axis(axis) {
+    this.$store.commit('settings', { camera_up: axis});
+
+    let camera = this.renderer.camera;
+    if (axis == 'z')
+      camera.up.set(0,0,1);
+    else if (axis == 'y')
+      camera.up.set(0,1,0);
+
+
+    this.renderer.controls.dispose();
+    this.renderer.setup_controls();
+
+    let scene = this.renderer.scene;
+    let grid_helper = scene.getObjectByName('GridHelper', true );
+    grid_helper.rotateX(-Math.PI/2);
   }
 
   raycast() {

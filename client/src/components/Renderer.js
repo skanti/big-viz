@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+//import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
 class Renderer {
   constructor(ctx, div_root, tag) {
@@ -35,9 +36,6 @@ class Renderer {
 
     // -> setup renderer
     this.camera = new THREE.PerspectiveCamera( 70, this.win.aspect_ratio, 0.1, 500 );
-    this.camera.up.set(0, 0, 1);
-    this.camera.position.x = 0.0;
-    this.camera.position.z = 1.0;
 
     this.axes_helper = new THREE.AxesHelper( 5 );
     this.scene.add(this.axes_helper);
@@ -55,6 +53,9 @@ class Renderer {
     this.root_container.addEventListener( 'pointermove', this.onmove_mouse.bind(this) );
     this.root_container.addEventListener( 'pointerdown', this.ondown_mouse.bind(this) );
     this.root_container.addEventListener( 'pointerup', this.onup_mouse.bind(this) );
+
+    this.stats_fps.domElement.style.cssText = 'position:relative;top:0px;left:0px;';
+    this.root_container.appendChild( this.stats_fps.dom );
     // <-
   }
 
@@ -91,22 +92,24 @@ class Renderer {
   }
 
   setup_controls() {
-    this.controls = new OrbitControls( this.camera, this.renderer.domElement );
 
+    this.controls = new OrbitControls( this.camera, this.renderer.domElement );
     this.controls.enableDamping = false;
     this.controls.screenSpacePanning = false;
-    this.controls.rotateSpeed = 0.5;
-    this.controls.target.set(10,0,0);
-
     this.controls.maxPolarAngle = Math.PI;
-    this.controls.update();
+    /*
+    this.controls = new TrackballControls( this.camera, this.renderer.domElement );
+    this.controls.rotateSpeed = 2.0;
+    this.controls.zoomSpeed = 0.5;
+    this.controls.panSpeed = 0.5;
+    */
 
-    this.stats_fps.domElement.style.cssText = 'position:relative;top:0px;left:0px;';
-    this.root_container.appendChild( this.stats_fps.dom );
+    this.controls.update();
 
   }
 
   advance() {
+   this.controls.update();
     this.renderer.render(this.scene, this.camera);
     this.stats_fps.update();
   }

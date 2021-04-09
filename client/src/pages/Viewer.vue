@@ -43,7 +43,11 @@
     <div class='row q-col-gutter-sm q-pa-sm'>
       <div class='col-9'>
         <div ref='div_scene' style='width:100%;height:75vh'>
-          <q-chip class='absolute' label='3D World' color='primary' text-color='white' icon='fas fa-cube' square />
+          <div class='absolute q-pa-xs q-gutter-xs'>
+            <q-btn size='sm' label='3D World' color='primary' text-color='white' icon='fas fa-cube' square dense unelevated />
+            <q-btn-toggle size='sm' class='absolute' toggle-color="blue-5" :value='settings.camera_up' dense no-wrap no-caps
+              :options="[{label: 'Y-up', value: 'y'}, {label: 'Z-up', value: 'z'} ]" @input="v => onclick_up_axis(v)" />
+          </div>
         </div>
       </div>
       <div class='col-3'>

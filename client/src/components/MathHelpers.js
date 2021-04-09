@@ -22,7 +22,7 @@ const compose_mat4 = function(trs) {
       let q = trs["q"];
       if (q.length != 4)
         throw Error("Quaternion 'q' in 'trs' has invalid size");
-      rot = new THREE.Quaternion(q[1], q[2], q[3], q[0]);
+      rot = new THREE.Quaternion(q[1], q[2], q[3], q[0]).normalize();
     }
 
     if ("s" in trs) {

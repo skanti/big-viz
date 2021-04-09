@@ -6,6 +6,7 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import PCAObject from '@/components/objects/PCAObject.js';
 import PointObject from '@/components/objects/PointObject.js';
 import PlyObject from '@/components/objects/PlyObject.js';
+import CamObject from '@/components/objects/CamObject.js';
 import LineObject from '@/components/objects/LineObject.js';
 import AnimationMotion from '@/components/AnimationMotion.js';
 import MathHelpers from '@/components/MathHelpers.js';
@@ -17,13 +18,19 @@ function make_verts_and_faces_mesh(ctx, data) {
 }
 
 function make_points_mesh(ctx, data) {
-  let points = new PointObject();
+  let points = new PointObject(ctx);
   points.make(data);
   return points.mesh;
 }
 
+function make_camera_mesh(ctx, data) {
+  let cam = new CamObject(ctx);
+  cam.make(data);
+  return cam.mesh;
+}
+
 function make_line_mesh(ctx, data) {
-  let obj = new LineObject();
+  let obj = new LineObject(ctx);
   obj.make(data);
   return obj.mesh;
 }
@@ -133,7 +140,8 @@ function make_group_mesh(ctx, data) {
 
 function make_mesh_from_type(ctx, data) {
   let type = data["type"];
-  let accepted_types = new Set(["animation", "group", "ply", "points", "line", "box", "pca_grid"]);
+  let accepted_types = new Set(["animation", "group", "ply", "points", "line", "box", "pca_grid",
+    "camera"]);
   if (!accepted_types.has(type)) {
     console.log("Warning: Received data has unknown type. Type: ", type);
     return
@@ -145,6 +153,8 @@ function make_mesh_from_type(ctx, data) {
     return make_points_mesh(ctx, data);
   else if (type === "line")
     return make_line_mesh(ctx, data);
+  else if (type === "camera")
+    return make_camera_mesh(ctx, data);
   else if (type === "box")
     return make_box_mesh(ctx, data);
   else if (type === "pca_grid")
