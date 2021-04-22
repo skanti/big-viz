@@ -8,7 +8,7 @@
     <q-card-section>
       <q-input
         bg-color="grey-2"
-        v-model="delay"
+        v-model="delay_"
         label="Delay (ms)"
         placeholder="200"
         hint="Delay in ms"
@@ -31,18 +31,20 @@
 export default {
   name: 'Toolbox',
   components: { },
-  props: [ 'ctx', 'id' ],
+  props: [ 'ctx', 'id', 'delay' ],
   data() {
     return {
-      delay: 60,
+      delay_: 60,
     };
   },
   created () {
+    if (this.delay)
+      this.delay_ = this.delay;
   },
   methods : {
     click_play: function() {
       let evt = "play_" + this.id;
-      this.ctx.event_bus.$emit(evt, { delay: this.delay } );
+      this.ctx.event_bus.$emit(evt, { delay: this.delay_ } );
     }
   }
 }

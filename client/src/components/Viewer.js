@@ -305,6 +305,7 @@ export default class Viewer extends Vue {
       this.loading = false;
     });
   }
+  
   onclick_up_axis(axis) {
     this.$store.commit('settings', { camera_up: axis});
 

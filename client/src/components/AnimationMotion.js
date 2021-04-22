@@ -34,7 +34,6 @@ class AnimationMotion {
   }
 
   async play(params) {
-    console.log("play");
     let delay = params["delay"];
 
     let frames_num = this.frames.length;
