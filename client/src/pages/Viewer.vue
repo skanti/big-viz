@@ -34,6 +34,7 @@
           </q-btn>
           <q-btn @click='onclick_screenshot' label='Screenshot' class='text-bold' color='blue-5' icon-right='fas fa-camera' dense />
           <q-btn @click='onclick_save_screenshot' label='Save Screenshot' class='text-bold' color='blue-5' icon-right='fas fa-download' dense />
+          <q-btn @click='onclick_copy_camera' label='Copy Camera' class='text-bold' color='blue-5' icon-right='fas fa-video' dense />
           <q-btn @click='onclick_clear_canvas' label='Clear Canvas' class='text-bold' color='red-5' icon-right='fas fa-times' dense />
         </div>
       </div>

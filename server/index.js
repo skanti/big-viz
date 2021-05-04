@@ -105,17 +105,17 @@ server.listen({'port' : port, 'host' : hostname}, () => {
       socket.broadcast.emit('user-disconnected', socket.id)
     })
 
-    socket.on('upsert', data => {
+    socket.on('upsert', (data, callback) => {
       console.log("receiving data");
       data = decodeURIComponent(escape(data));
-      socket.emit('ok');
       socket.broadcast.emit('upsert', data);
+      callback({'status': 'ok'});
     })
 
-    socket.on('update', data => {
+    socket.on('update', (data, callback) => {
       data = decodeURIComponent(escape(data));
       socket.emit('ok');
-      socket.broadcast.emit('update', data);
+      callback({'status': 'ok'});
     })
   })
 

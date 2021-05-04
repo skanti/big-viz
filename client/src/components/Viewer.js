@@ -6,7 +6,7 @@ import path from 'path';
 import * as THREE from "three";
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
-
+import { copyToClipboard } from 'quasar'
 
 import Menu from '@/components/Menu.vue';
 import PCAToolbox from '@/components/toolboxes/PCAToolbox.vue';
@@ -127,8 +127,6 @@ export default class Viewer extends Vue {
     a.download = "canvas_" + (new Date()).toISOString() + ".png";
     a.click();
   }
-  onclick_animation() {
-  }
 
   onclick_screenshot() {
     let img = new Image();
@@ -144,6 +142,19 @@ export default class Viewer extends Vue {
     document.body.removeChild(img);
   }
 
+  onclick_copy_camera() {
+    let cam = this.renderer.camera;
+    let t = cam.position.toArray();
+    let q = cam.quaternion.toArray();
+    q = [q[3], q[0], q[1], q[2]]; // xyzw to wxyz
+
+    let d = JSON.stringify({ t: t, q: q  })
+    copyToClipboard(d).then(() => {
+      console.log("copied");
+    }).catch(() => {
+      console.log("copy failed");
+    })
+  }
 
   add_ground_plane_to_scene() {
     let width = 100.0;
