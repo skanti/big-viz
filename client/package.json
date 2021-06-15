@@ -3,8 +3,8 @@
   "version": "1.0.1",
   "private": true,
   "scripts": {
-    "dev": "vue-cli-service build --modern --watch",
-    "build": "vue-cli-service build --modern",
+    "dev": "vue-cli-service build --watch",
+    "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

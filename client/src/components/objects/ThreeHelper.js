@@ -135,6 +135,7 @@ function make_group_mesh(ctx, data) {
     let m = make_mesh_from_type(ctx, obj);
     group.add(m);
   });
+  group.name = data["id"];
   return group;
 }
 

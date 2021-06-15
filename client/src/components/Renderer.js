@@ -40,8 +40,10 @@ class Renderer {
     this.axes_helper = new THREE.AxesHelper( 5 );
     this.scene.add(this.axes_helper);
 
+    // set lighting
     this.scene.add( new THREE.AmbientLight( 0x555555 ) );
     let light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+    light.name = "Light";
     light.position.set(0.1,0.1,1);
     this.scene.add( light );
     this.scene.background = new THREE.Color("rgb(240, 230, 230)");

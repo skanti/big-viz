@@ -316,7 +316,7 @@ export default class Viewer extends Vue {
       this.loading = false;
     });
   }
-  
+
   onclick_up_axis(axis) {
     this.$store.commit('settings', { camera_up: axis});
 
@@ -333,6 +333,13 @@ export default class Viewer extends Vue {
     let scene = this.renderer.scene;
     let grid_helper = scene.getObjectByName('GridHelper', true );
     grid_helper.rotateX(-Math.PI/2);
+
+    let light = scene.getObjectByName('Light', true );
+    if (axis == 'z')
+      light.position.set(0.1, 0.1, 1);
+    else if (axis == 'y')
+      light.position.set(0.1, 1.0, 0.1);
+    console.log('axis', axis);
   }
 
   raycast() {
