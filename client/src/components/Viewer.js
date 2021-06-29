@@ -41,6 +41,7 @@ export default class Viewer extends Vue {
   data() {
     return {
       ctx: new Context(),
+      image_src_current: '',
       loading: false,
       is_active: false,
       mesh_bbox: null,
@@ -266,6 +267,13 @@ export default class Viewer extends Vue {
   on_ws_upsert(data) {
     this.toolbox = "";
     data = JSON.parse(data);
+    // check if image
+    if (data['type'] == 'image') {
+      document.getElementById('img_div').src = data["data"];
+      this.$q.notify({ message: 'Image upserted!', caption: ':)', color: 'green-5' });
+      return;
+    }
+    // else check for 3D data
     try {
       let meshes = ThreeHelper.make_mesh_from_type(this.ctx, data);
       if (!Array.isArray(meshes))
@@ -273,6 +281,7 @@ export default class Viewer extends Vue {
 
       meshes.forEach(mesh => this.renderer.upsert_mesh(mesh));
       this.ctx.event_bus.$emit("new_object");
+      this.$q.notify({ message: 'Object upserted!', caption: ':)', color: 'green-5' });
     } catch (err){
       console.log(err);
     }
