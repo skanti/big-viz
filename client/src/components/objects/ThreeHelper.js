@@ -8,7 +8,8 @@ import PointObject from '@/components/objects/PointObject.js';
 import PlyObject from '@/components/objects/PlyObject.js';
 import CamObject from '@/components/objects/CamObject.js';
 import LineObject from '@/components/objects/LineObject.js';
-import AnimationMotion from '@/components/AnimationMotion.js';
+import AnimationMotion from '@/components/objects/AnimationMotion.js';
+import AnimationVisibility from '@/components/objects/AnimationVisibility.js';
 import MathHelpers from '@/components/MathHelpers.js';
 
 function make_verts_and_faces_mesh(ctx, data) {
@@ -35,7 +36,7 @@ function make_line_mesh(ctx, data) {
   return obj.mesh;
 }
 
-function make_animation(ctx, data) {
+function make_animation_motion(ctx, data) {
   let { objects } = data;
   let meshes = [];
   if (objects) {
@@ -48,6 +49,13 @@ function make_animation(ctx, data) {
   obj.make(data);
   ctx.event_bus.$emit("new_animation", data)
   return meshes;
+}
+
+function make_animation_visibility(ctx, data) {
+  let obj = new AnimationVisibility(ctx);
+  obj.make(data);
+  ctx.event_bus.$emit("new_animation", data)
+  return [];
 }
 
 function find_and_make_update(ctx, update) {
@@ -136,13 +144,19 @@ function make_group_mesh(ctx, data) {
     group.add(m);
   });
   group.name = data["id"];
+
+  let visible = false;
+  if ("visible" in data) {
+      visible = data["visible"];
+    }
+  group.visible = visible;
   return group;
 }
 
 function make_mesh_from_type(ctx, data) {
   let type = data["type"];
-  let accepted_types = new Set(["animation", "group", "ply", "points", "line", "box", "pca_grid",
-    "camera"]);
+  let accepted_types = new Set(["animation_motion", "animation_visibility",
+    "group", "ply", "points", "line", "box", "pca_grid", "camera"]);
   if (!accepted_types.has(type)) {
     console.log("Warning: Received data has unknown type. Type: ", type);
     return
@@ -160,11 +174,13 @@ function make_mesh_from_type(ctx, data) {
     return make_box_mesh(ctx, data);
   else if (type === "pca_grid")
     return make_pca_grid_mesh(ctx, data);
-  else if (type === "animation")
-    return make_animation(ctx, data);
+  else if (type === "animation_motion")
+    return make_animation_motion(ctx, data);
+  else if (type === "animation_visibility")
+    return make_animation_visibility(ctx, data);
   else if (type === "group")
     return make_group_mesh(ctx, data);
 }
 
 export default {make_mesh_from_type, make_points_mesh, make_line_mesh, make_box_mesh, make_pca_grid_mesh,
-  make_verts_and_faces_mesh, make_animation, find_and_make_update};
+  make_verts_and_faces_mesh, make_animation_motion, find_and_make_update};

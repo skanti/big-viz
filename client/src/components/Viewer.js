@@ -238,6 +238,7 @@ export default class Viewer extends Vue {
 
   on_new_animation(params) {
     this.toolbox = AnimationToolbox;
+    params["scene"] = this.renderer.scene;
     this.toolbox_props = params;
   }
 

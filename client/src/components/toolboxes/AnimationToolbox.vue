@@ -31,7 +31,7 @@
 export default {
   name: 'Toolbox',
   components: { },
-  props: [ 'ctx', 'id', 'delay' ],
+  props: [ 'ctx', 'id', 'delay', 'scene' ],
   data() {
     return {
       delay_: 60,
@@ -44,7 +44,7 @@ export default {
   methods : {
     click_play: function() {
       let evt = "play_" + this.id;
-      this.ctx.event_bus.$emit(evt, { delay: this.delay_ } );
+      this.ctx.event_bus.$emit(evt, { delay: this.delay_,  scene: this.scene } );
     }
   }
 }
