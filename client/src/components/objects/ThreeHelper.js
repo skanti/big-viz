@@ -7,6 +7,7 @@ import PCAObject from '@/components/objects/PCAObject.js';
 import PointObject from '@/components/objects/PointObject.js';
 import PlyObject from '@/components/objects/PlyObject.js';
 import CamObject from '@/components/objects/CamObject.js';
+import ArrowObject from '@/components/objects/ArrowObject.js';
 import LineObject from '@/components/objects/LineObject.js';
 import AnimationMotion from '@/components/objects/AnimationMotion.js';
 import AnimationVisibility from '@/components/objects/AnimationVisibility.js';
@@ -28,6 +29,12 @@ function make_camera_mesh(ctx, data) {
   let cam = new CamObject(ctx);
   cam.make(data);
   return cam.mesh;
+}
+
+function make_arrow_mesh(ctx, data) {
+  let obj = new ArrowObject(ctx);
+  obj.make(data);
+  return obj.mesh;
 }
 
 function make_line_mesh(ctx, data) {
@@ -156,7 +163,7 @@ function make_group_mesh(ctx, data) {
 function make_mesh_from_type(ctx, data) {
   let type = data["type"];
   let accepted_types = new Set(["animation_motion", "animation_visibility",
-    "group", "ply", "points", "line", "box", "pca_grid", "camera"]);
+    "group", "ply", "points", "line", "box", "pca_grid", "camera", "arrow"]);
   if (!accepted_types.has(type)) {
     console.log("Warning: Received data has unknown type. Type: ", type);
     return
@@ -170,6 +177,8 @@ function make_mesh_from_type(ctx, data) {
     return make_line_mesh(ctx, data);
   else if (type === "camera")
     return make_camera_mesh(ctx, data);
+  else if (type === "arrow")
+    return make_arrow_mesh(ctx, data);
   else if (type === "box")
     return make_box_mesh(ctx, data);
   else if (type === "pca_grid")
