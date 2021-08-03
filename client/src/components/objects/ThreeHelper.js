@@ -152,7 +152,7 @@ function make_group_mesh(ctx, data) {
   });
   group.name = data["id"];
 
-  let visible = false;
+  let visible = true;
   if ("visible" in data) {
       visible = data["visible"];
     }

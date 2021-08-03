@@ -41,7 +41,7 @@ export default class Viewer extends Vue {
   data() {
     return {
       ctx: new Context(),
-      image_src_current: '',
+      images_src: [],
       loading: false,
       is_active: false,
       mesh_bbox: null,
@@ -270,7 +270,8 @@ export default class Viewer extends Vue {
     data = JSON.parse(data);
     // check if image
     if (data['type'] == 'image') {
-      document.getElementById('img_div').src = data["data"];
+      //document.getElementById('img_div').src = data["data"];
+      this.images_src.push(data['data']);
       this.$q.notify({ message: 'Image upserted!', caption: ':)', color: 'green-5' });
       return;
     }

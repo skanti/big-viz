@@ -16,6 +16,7 @@ class PointObject {
   color = null;
   colors = null;
   badge = "";
+  transparent = false;
 
   geometry = null;
   material = null;
@@ -53,6 +54,10 @@ class PointObject {
       this.colors = data["colors"];
     }
 
+    if ("transparent" in data) {
+      this.transparent = data["transparent"];
+    }
+
     if ("badge" in data) {
       this.badge = data["badge"];
     }
@@ -67,7 +72,7 @@ class PointObject {
     const res = this.res;
     const color = this.color;
     this.geometry = new THREE.BoxBufferGeometry(res, res, res);
-    this.material = new THREE.MeshLambertMaterial( { color: color });
+    this.material = new THREE.MeshLambertMaterial( { color: color, opacity: 0.3, transparent: this.transparent });
 
     const positions = this.positions;
     const colors = this.colors;

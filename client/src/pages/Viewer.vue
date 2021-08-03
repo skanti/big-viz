@@ -56,8 +56,10 @@
         <component :is='toolbox' v-bind='toolbox_props' class='full-width' :ctx='ctx'></component>
       </div>
     </div>
-    <div class='q-mt-lg q-pa-sm' style='max-width:800px'>
-      <img id='img_div' :src='image_src_current' />
+    <div class='row q-mt-lg q-gutter-sm q-pa-sm' style='max-width:800px'>
+      <div v-for='(img_src,i) in images_src' :key='"img_div" + i'>
+        <img :src='img_src' />
+      </div>
     </div>
 
   </q-page>
