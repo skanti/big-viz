@@ -84,9 +84,9 @@ router.get('/data/*', function(req, res, next) {
 app.use('/', router);
 module.exports = router;
 
-const hostname = process.env.HOSTNAME;
-const port = process.env.PORT;
-const url = process.env.URL;
+const hostname = process.env.SERVER_HOSTNAME;
+const port = process.env.SERVER_PORT;
+const url = process.env.SERVER_URL;
 
 const server = http.createServer(app);
 
