@@ -15,6 +15,7 @@
     "jpeg-js": "^0.4.3",
     "mathjs": "^9.3.0",
     "nanoevents": "^5.1.13",
+    "node-sass": "^6.0.1",
     "path": "^0.12.7",
     "quasar": "^1.15.7",
     "sass-loader": "^10.1.1",
@@ -37,7 +38,6 @@
     "babel-plugin-transform-imports": "2.0.0",
     "eslint": "^7.22.0",
     "eslint-plugin-vue": "^7.8.0",
-    "node-sass": "^5.0.0",
     "vue-cli-plugin-quasar": "~3.0.1",
     "vue-template-compiler": "^2.6.12"
   },
