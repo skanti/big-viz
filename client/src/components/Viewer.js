@@ -177,7 +177,7 @@ export default class Viewer extends Vue {
     const geometry = loader.parse(buffer);
     geometry.computeVertexNormals();
     let color = new THREE.Color("rgb(250, 250, 150)")
-    const material = new THREE.MeshLambertMaterial( { color: color, side: THREE.DoubleSide});
+    const material = new THREE.MeshStandardMaterial( { color: color, side: THREE.DoubleSide});
     const mesh = new THREE.Mesh( geometry, material );
 
     this.renderer.upsert_mesh(mesh);
@@ -187,7 +187,7 @@ export default class Viewer extends Vue {
     const loader = new OBJLoader();
     const mesh = loader.parse(buffer);
     let color = new THREE.Color("rgb(250, 250, 150)");
-    const material = new THREE.MeshLambertMaterial( { color: color, side: THREE.DoubleSide});
+    const material = new THREE.MeshStandardMaterial( { color: color, side: THREE.DoubleSide});
     //const mesh = new THREE.Mesh( geometry, material );
     mesh.traverse(function(child) {
       if (child instanceof THREE.Mesh) {

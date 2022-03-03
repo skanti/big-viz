@@ -72,7 +72,7 @@ class PointObject {
     const res = this.res;
     const color = this.color;
     this.geometry = new THREE.BoxBufferGeometry(res, res, res);
-    this.material = new THREE.MeshLambertMaterial( { color: color, opacity: 0.3, transparent: this.transparent });
+    this.material = new THREE.MeshStandardMaterial( { color: color, opacity: 0.3, transparent: this.transparent });
 
     const positions = this.positions;
     const colors = this.colors;

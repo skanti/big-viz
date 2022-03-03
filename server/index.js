@@ -94,7 +94,8 @@ server.listen({'port' : port, 'host' : hostname}, () => {
   console.log(`Server running at ${url}`);
 
 
-  let ws_handle = io(server, { cors: { origin: '*', }, maxHttpBufferSize: 1e9 });
+  let ws_handle = io(server, { cors: { origin: '*', }, maxHttpBufferSize: 1e9,
+    timeout: 120*1000 });
 
   ws_handle.on('connection', socket => {
     console.log(`A user connected with socket id ${socket.id}`)

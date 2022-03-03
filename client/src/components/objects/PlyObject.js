@@ -69,8 +69,9 @@ class PlyObject {
     this.geometry.setIndex( this.faces );
     this.geometry.computeVertexNormals();
 
-    this.material = new THREE.MeshLambertMaterial(
-      { color: color, side: THREE.DoubleSide, vertexColors: this.has_vertex_colors });
+    this.material = new THREE.MeshStandardMaterial(
+      { color: color, side: THREE.DoubleSide, vertexColors: this.has_vertex_colors }
+    );
 
     this.mesh = new THREE.Mesh( this.geometry, this.material );
 

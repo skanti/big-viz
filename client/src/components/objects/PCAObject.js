@@ -107,7 +107,7 @@ class PCAObject {
     const res = this.res;
     const color = this.color;
     this.geometry = new THREE.BoxBufferGeometry(res, res, res);
-    this.material = new THREE.MeshLambertMaterial( { color: color });
+    this.material = new THREE.MeshStandardMaterial( { color: color });
 
     const n_positions = this.points.length;
     this.mesh = new THREE.InstancedMesh( this.geometry, this.material, n_positions );
