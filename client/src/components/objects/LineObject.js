@@ -16,6 +16,7 @@ class LineObject {
 
   trs = null;
   color = null;
+  colors = null;
 
   geometry = null;
   material = null;
@@ -44,10 +45,14 @@ class LineObject {
     }
 
     if ("color" in data) {
-      let c = data["color"];
+      let c = data.color;
       if (c.length != 3)
         throw Error("'color' field must have size 3");
       this.color = new THREE.Color(c[0], c[1], c[2]);
+    }
+
+    if ("colors" in data) {
+      this.colors = data.colors.flat();
     }
   }
 
@@ -63,7 +68,12 @@ class LineObject {
     //const path =  new THREE.Float32BufferAttribute( this.points, 3 );
     const path = this.points;
     this.geometry.setPositions(path);
-    this.material = new LineMaterial({ color: this.color, linewidth: this.width });
+    if (this.colors) {
+      this.geometry.setColors(this.colors);
+    }
+    const has_vertex_colors = this.colors ? true : false;
+    this.material = new LineMaterial({ color: this.color, vertexColors: has_vertex_colors,
+      linewidth: this.width });
 
     this.mesh = new Line2( this.geometry, this.material );
     this.mesh.computeLineDistances();
