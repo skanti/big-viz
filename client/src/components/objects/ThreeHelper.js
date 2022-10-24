@@ -5,6 +5,7 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 
 import PCAObject from '@/components/objects/PCAObject.js';
 import PointObject from '@/components/objects/PointObject.js';
+import ArchitectureObject from '@/components/objects/ArchitectureObject.js';
 import PlyObject from '@/components/objects/PlyObject.js';
 import CamObject from '@/components/objects/CamObject.js';
 import ArrowObject from '@/components/objects/ArrowObject.js';
@@ -20,9 +21,15 @@ function make_verts_and_faces_mesh(ctx, data) {
 }
 
 function make_points_mesh(ctx, data) {
-  let points = new PointObject(ctx);
-  points.make(data);
-  return points.mesh;
+  const obj = new PointObject(ctx);
+  obj.make(data);
+  return obj.mesh;
+}
+
+function make_architecture_mesh(ctx, data) {
+  const obj = new ArchitectureObject(ctx);
+  obj.make(data);
+  return obj.mesh;
 }
 
 function make_camera_mesh(ctx, data) {
@@ -72,7 +79,7 @@ function find_and_make_update(ctx, update) {
 
   let mesh = ctx.renderer.scene.getObjectByName(id, true );
   if (!mesh) {
-    console.log("No mesh found with id:" + id);
+    console.log("No mesh found with id: " + id);
     return
   }
 
@@ -163,7 +170,7 @@ function make_group_mesh(ctx, data) {
 function make_mesh_from_type(ctx, data) {
   let type = data["type"];
   let accepted_types = new Set(["animation_motion", "animation_visibility",
-    "group", "ply", "points", "line", "box", "pca_grid", "camera", "arrow"]);
+    "architecture", "group", "ply", "points", "line", "box", "pca_grid", "camera", "arrow"]);
   if (!accepted_types.has(type)) {
     console.log("Warning: Received data has unknown type. Type: ", type);
     return
@@ -179,6 +186,8 @@ function make_mesh_from_type(ctx, data) {
     return make_camera_mesh(ctx, data);
   else if (type === "arrow")
     return make_arrow_mesh(ctx, data);
+  else if (type === "architecture")
+    return make_architecture_mesh(ctx, data);
   else if (type === "box")
     return make_box_mesh(ctx, data);
   else if (type === "pca_grid")
@@ -192,4 +201,4 @@ function make_mesh_from_type(ctx, data) {
 }
 
 export default {make_mesh_from_type, make_points_mesh, make_line_mesh, make_box_mesh, make_pca_grid_mesh,
-  make_verts_and_faces_mesh, make_animation_motion, find_and_make_update};
+  make_architecture_mesh, make_verts_and_faces_mesh, make_animation_motion, find_and_make_update};
