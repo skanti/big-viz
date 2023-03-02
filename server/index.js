@@ -90,7 +90,7 @@ const url = process.env.SERVER_URL;
 
 const server = http.createServer(app);
 
-server.listen({'port' : port, 'host' : hostname}, () => {
+server.listen({'port' : port }, () => {
   console.log(`Server running at ${url}`);
 
 
@@ -98,12 +98,18 @@ server.listen({'port' : port, 'host' : hostname}, () => {
     timeout: 120*1000 });
 
   ws_handle.on('connection', socket => {
-    console.log(`A user connected with socket id ${socket.id}`)
+    const timestamp = new Date();
+    console.log(`New user connected, socket_id=${socket.id}, timestamp=${timestamp}`)
 
     socket.emit('user', socket.id)
 
     socket.on('disconnect', () => {
       socket.broadcast.emit('user-disconnected', socket.id)
+    })
+
+    socket.on('ping', (data, callback) => {
+      console.log("ping")
+      socket.emit('ping', socket.id)
     })
 
     socket.on('upsert', (data, callback) => {

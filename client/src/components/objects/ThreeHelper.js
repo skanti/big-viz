@@ -5,6 +5,7 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 
 import PCAObject from '@/components/objects/PCAObject.js';
 import PointObject from '@/components/objects/PointObject.js';
+import LabelObject from '@/components/objects/LabelObject.js';
 import ArchitectureObject from '@/components/objects/ArchitectureObject.js';
 import PlyObject from '@/components/objects/PlyObject.js';
 import CamObject from '@/components/objects/CamObject.js';
@@ -46,6 +47,12 @@ function make_arrow_mesh(ctx, data) {
 
 function make_line_mesh(ctx, data) {
   let obj = new LineObject(ctx);
+  obj.make(data);
+  return obj.mesh;
+}
+
+function make_label_mesh(ctx, data) {
+  let obj = new LabelObject(ctx);
   obj.make(data);
   return obj.mesh;
 }
@@ -101,14 +108,14 @@ function make_pca_grid_mesh(ctx, data) {
 
 function make_box_mesh(ctx, data) {
 
-  let color = data["color"];
+  let color = data.color;
   if (color) {
     if (color.length != 3)
       throw Error("'color' element has to size=3");
     color = new THREE.Color(color[0], color[1], color[2]);
   }
 
-  let width = data["width"];
+  const width = data.width;
 
   let path =  [ // root
     // back
@@ -142,10 +149,12 @@ function make_box_mesh(ctx, data) {
   const wireframe = new Line2( geometry, material );
   wireframe.computeLineDistances();
 
-  let trs = data["trs"];
-  let mat = MathHelpers.compose_mat4(trs);
-  wireframe.applyMatrix4(mat);
-  wireframe.name = data["id"];
+  const trs = data.trs;
+  if (trs) {
+    let mat = MathHelpers.compose_mat4(trs);
+    wireframe.applyMatrix4(mat);
+  }
+  wireframe.name = data.id;
   return wireframe;
 }
 
@@ -170,7 +179,7 @@ function make_group_mesh(ctx, data) {
 function make_mesh_from_type(ctx, data) {
   let type = data["type"];
   let accepted_types = new Set(["animation_motion", "animation_visibility",
-    "architecture", "group", "ply", "points", "line", "box", "pca_grid", "camera", "arrow"]);
+    "architecture", "group", "ply", "points", "line", "label", "box", "pca_grid", "camera", "arrow"]);
   if (!accepted_types.has(type)) {
     console.log("Warning: Received data has unknown type. Type: ", type);
     return
@@ -182,6 +191,8 @@ function make_mesh_from_type(ctx, data) {
     return make_points_mesh(ctx, data);
   else if (type === "line")
     return make_line_mesh(ctx, data);
+  else if (type === "label")
+    return make_label_mesh(ctx, data);
   else if (type === "camera")
     return make_camera_mesh(ctx, data);
   else if (type === "arrow")

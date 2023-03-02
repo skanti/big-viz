@@ -61,7 +61,7 @@ export default class Viewer extends Vue {
     this.renderer.camera.position.set(5,5,2);
     this.renderer.controls.target.set(0,0,0);
     this.renderer.controls.update();
-    this.$store.commit("scene", this.renderer.scene);
+    //this.$store.commit("scene", this.renderer.scene);
     // <-
 
     // -> set listeners
