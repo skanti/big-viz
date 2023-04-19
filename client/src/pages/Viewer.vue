@@ -52,7 +52,7 @@
         </div>
       </div>
       <div class='col-3'>
-        <Menu ref='menu' class='full-width' :ctx='ctx' style='height:75v'/>
+        <MenuPanel ref='menu' class='full-width' :ctx='ctx' style='height:75v'/>
         <component :is='toolbox' v-bind='toolbox_props' class='full-width' :ctx='ctx'></component>
       </div>
     </div>
@@ -67,7 +67,7 @@
 
 <script>
 
-import Viewer  from '@/components/Viewer.js';
+import Viewer  from '@/pages/Viewer.js';
 
 export default Viewer;
 </script>

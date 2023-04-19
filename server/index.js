@@ -1,6 +1,5 @@
 const env = require('dotenv-safe').config({path : './.env', example : './.env.example'});
-require('dotenv-expand')(env)
-global.__basedir = __dirname;
+require('dotenv-expand').expand(env);
 
 const fs = require('fs');
 const express = require('express');

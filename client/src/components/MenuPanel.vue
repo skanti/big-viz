@@ -42,8 +42,12 @@
 
 <script>
 
+// store
+import { mapWritableState } from 'pinia';
+import useStore from '@/store/index.js';
+
 export default {
-  name: 'Menu',
+  name: 'MenuPanel',
   components: { },
   props: [ 'ctx' ],
   data() {
@@ -60,13 +64,16 @@ export default {
       },
     }
   }, computed: {
-    scene: function () {
-      return this.$store.state.scene;
-    },
+    ...mapWritableState(useStore, ['scene']),
     rows: function() {
+      if (this.scene === null) {
+        return null;
+      }
+
       const children = this.scene.children;
-      if (children === undefined || children.length == 0)
+      if (children === undefined || children.length == 0) {
         return [];
+      }
 
       let rows = [];
       let name_mapping = {};
@@ -87,7 +94,7 @@ export default {
       return rows;
     },
   }, created () {
-    this.ctx.event_bus.$on("new_object", this.add_new_object);
+    this.ctx.on("new_object", this.add_new_object);
   }, methods : {
     add_new_object: function () {
     },

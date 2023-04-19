@@ -1,25 +1,20 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
+import Viewer from '@/pages/Viewer.vue'
+import Error404 from '@/pages/Error404.vue'
 
-Vue.use(VueRouter)
+const routes = [
+  {
+    path: '/',
+    component: () => import('@/layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: Viewer }
+    ]
+  }
+]
 
-const router = new VueRouter({
-  mode: "history",
-  routes : [
-    {
-      path: '/',
-      component: () => import('@/layouts/MainLayout.vue'),
-      children: [
-        { path: '', component: () => import('@/pages/Viewer.vue') }
-      ]
-    },
-    {
-      path: '*',
-      component: () => import('@/pages/Error404.vue')
-    }
-  ]
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes
 })
 
-
 export default router;
-

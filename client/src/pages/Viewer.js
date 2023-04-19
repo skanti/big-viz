@@ -1,14 +1,12 @@
 import Vue from 'vue'
-import Component from 'vue-class-component'
 import axios from 'axios';
-import path from 'path';
 //import { mapState } from 'vuex'
 import * as THREE from "three";
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { copyToClipboard } from 'quasar'
 
-import Menu from '@/components/Menu.vue';
+import MenuPanel from '@/components/MenuPanel.vue';
 import PCAToolbox from '@/components/toolboxes/PCAToolbox.vue';
 import AnimationToolbox from '@/components/toolboxes/AnimationToolbox.vue';
 import Renderer from '@/components/Renderer.js';
@@ -16,97 +14,57 @@ import Context from '@/components/Context.js';
 
 import ThreeHelper from '@/components/objects/ThreeHelper.js';
 
-@Component({
-  name: "Viewer",
-  components: { Menu, PCAToolbox, AnimationToolbox },
-  computed: {
-    search_text: {
-      get () {
-        return this.$store.state.search_text;
-      },
-      set (v) {
-        this.$store.commit("search_text", v);
-      },
-    },
-    settings: {
-      get () {
-        return this.$store.state.settings;
-      },
-    }
-  }
-})
-export default class Viewer extends Vue {
+// store
+import { mapWritableState } from 'pinia';
+import useStore from '@/store/index.js';
 
+// global non-reactive variable
+let renderer = null;
 
-  data() {
-    return {
-      ctx: new Context(),
-      images_src: [],
-      loading: false,
-      is_active: false,
-      mesh_bbox: null,
-      raycaster: new THREE.Raycaster(),
-      id_raycast: -1,
-      renderer: null,
-      toolbox: null,
-      toolbox_props: {},
-    }
-  }
-
+// methods
+const methods = {
   init() {
     this.loading = true;
 
-    // -> init renderer
-    this.renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
-    this.renderer.camera.position.set(5,5,2);
-    this.renderer.controls.target.set(0,0,0);
-    this.renderer.controls.update();
-    //this.$store.commit("scene", this.renderer.scene);
-    // <-
+    // init renderer
+    renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
+    renderer.camera.position.set(5,5,2);
+    renderer.controls.target.set(0,0,0);
+    renderer.controls.update();
 
-    // -> set listeners
-    this.ctx.event_bus.$on("onclick_mouse_renderer", this.onclick_mouse.bind(this));
-    this.ctx.event_bus.$on("selected", this.onclick_selected.bind(this));
-    this.ctx.event_bus.$on("new_animation", this.on_new_animation.bind(this));
-    // <-
+    // set listeners
+    this.ctx.on("onclick_mouse_renderer", this.onclick_mouse.bind(this));
+    this.ctx.on("selected", this.onclick_selected.bind(this));
+    this.ctx.on("new_animation", this.on_new_animation.bind(this));
 
-    // -> trigger
+    // ground plane
     this.add_ground_plane_to_scene();
-    // <-
 
-    // -> add listener
-    this.$socket.$subscribe('user', id_socket => console.log("id_socket", id_socket));
-    this.$socket.$subscribe('upsert', this.on_ws_upsert.bind(this));
-    this.$socket.$subscribe('update', this.on_ws_update.bind(this));
-    // <-
+    // add listener
+    this.$socket.on('user', id_socket => console.log("id_socket", id_socket));
+    this.$socket.on('upsert', this.on_ws_upsert.bind(this));
+    this.$socket.on('update', this.on_ws_update.bind(this));
 
     this.is_active = true;
 
     this.onclick_up_axis(this.settings.camera_up);
 
-    // -> run animation loop
+    // run animation loop
     this.advance_ref = this.advance.bind(this);
     this.advance();
-    // <-
 
     setTimeout(() => {
       this.loading = false;
     }, 2000);
 
-  }
-
-  mounted() {
-    //console.log("dummy", this.dummy);
-    //this.$store.commit("dummy_increment", this.dummy)
-    this.init();
-  }
+  },
 
   onclick_clear_cache() {
     localStorage.clear();
-  }
+  },
 
   onclick_clear_canvas() {
-    const children = this.renderer.scene.children;
+    const children = renderer.scene.children;
     if (children === undefined || children.length == 0)
       return;
 
@@ -118,20 +76,20 @@ export default class Viewer extends Vue {
       if (type.includes("Grid"))
         survived.push(obj);
     }
-    this.renderer.scene.children = survived;
-  }
+    renderer.scene.children = survived;
+  },
 
   onclick_save_screenshot() {
-    let src = this.renderer.renderer.domElement.toDataURL();
+    let src = renderer.renderer.domElement.toDataURL();
     let a = document.createElement("a");
     a.href = src.replace("image/png", "image/octet-stream");
     a.download = "canvas_" + (new Date()).toISOString() + ".png";
     a.click();
-  }
+  },
 
   onclick_screenshot() {
     let img = new Image();
-    img.src = this.renderer.renderer.domElement.toDataURL();
+    img.src = renderer.renderer.domElement.toDataURL();
     document.body.appendChild(img);
     let r = document.createRange();
     r.setStartBefore(img);
@@ -141,10 +99,10 @@ export default class Viewer extends Vue {
     sel.addRange(r);
     document.execCommand('Copy');
     document.body.removeChild(img);
-  }
+  },
 
   onclick_copy_camera() {
-    let cam = this.renderer.camera;
+    let cam = renderer.camera;
     let t = cam.position.toArray();
     let q = cam.quaternion.toArray();
     q = [q[3], q[0], q[1], q[2]]; // xyzw to wxyz
@@ -155,7 +113,7 @@ export default class Viewer extends Vue {
     }).catch(() => {
       console.log("copy failed");
     })
-  }
+  },
 
   add_ground_plane_to_scene() {
     let width = 100.0;
@@ -167,10 +125,8 @@ export default class Viewer extends Vue {
     helper.position.z = 0.001;
     helper.material.opacity = 0.25;
     helper.material.transparent = true;
-    this.renderer.scene.add( helper );
-  }
-
-
+    renderer.scene.add( helper );
+  },
 
   parse_ply_and_add_to_scene(id, buffer) {
     const loader = new PLYLoader();
@@ -180,8 +136,8 @@ export default class Viewer extends Vue {
     const material = new THREE.MeshStandardMaterial( { color: color, side: THREE.DoubleSide});
     const mesh = new THREE.Mesh( geometry, material );
 
-    this.renderer.upsert_mesh(mesh);
-  }
+    renderer.upsert_mesh(mesh);
+  },
 
   add_obj_to_scene(id, buffer) {
     const loader = new OBJLoader();
@@ -195,18 +151,17 @@ export default class Viewer extends Vue {
       }
     });
 
-    this.renderer.upsert_mesh(mesh);
-  }
+    renderer.upsert_mesh(mesh);
+  },
 
   parse_json_and_add_to_scene(id, buffer) {
     let data = new TextDecoder().decode(buffer);
     this.on_ws_upsert(data);
-  }
-
+  },
 
   onclick_mouse(event) {
     this.onclick_instance(event);
-  }
+  },
 
   onclick_selected(selected) {
     let id = selected["id"];
@@ -215,16 +170,14 @@ export default class Viewer extends Vue {
       return;
     }
 
-
     let obj = null;
-    for (let v of Object.values(this.renderer.scene.children)) {
+    for (let v of Object.values(renderer.scene.children)) {
       const is_match = v["name"] === id;
       if (is_match) {
         obj = v.raw;
         break;
       }
     }
-
 
     if (obj === null)
       return;
@@ -233,37 +186,35 @@ export default class Viewer extends Vue {
       this.toolbox = PCAToolbox;
       this.toolbox_props = {  variances: obj.variances };
     }
-
-  }
+  },
 
   on_new_animation(params) {
     this.toolbox = AnimationToolbox;
-    params["scene"] = this.renderer.scene;
+    params["scene"] = renderer.scene;
     this.toolbox_props = params;
-  }
-
+  },
 
   onclick_instance(event) {
-
     const is_instance = this.id_raycast != -1;
     const is_left_click = event.button == 0;
     //console.log("is_left_click", is_left_click);
 
     if (is_instance && is_left_click) {
-      this.ctx.event_bus.$emit("instance_selected", this.id_raycast);
+      this.ctx.emit("instance_selected", this.id_raycast);
     }
-  }
+  },
+
   on_ws_update(data) {
     data = JSON.parse(data);
     try {
       //this.toolbox = AnimationToolbox;
       //this.toolbox_props = { id: "abc" };
-      this.renderer.update_mesh(data);
-      this.ctx.event_bus.$emit("updated_object");
+      renderer.update_mesh(data);
+      this.ctx.emit("updated_object");
     } catch (err){
       console.log(err);
     }
-  }
+  },
 
   on_ws_upsert(data) {
     this.toolbox = "";
@@ -281,14 +232,13 @@ export default class Viewer extends Vue {
       if (!Array.isArray(meshes))
         meshes = [meshes];
 
-      meshes.forEach(mesh => this.renderer.upsert_mesh(mesh));
-      this.ctx.event_bus.$emit("new_object");
+      meshes.forEach(mesh => renderer.upsert_mesh(mesh));
+      this.ctx.emit("new_object");
       this.$q.notify({ message: 'Object upserted!', caption: ':)', color: 'green-5' });
     } catch (err){
       console.log(err);
     }
-
-  }
+  },
 
   on_grab_data(filename, data) {
     let suffix = filename.split('.').pop();
@@ -311,9 +261,8 @@ export default class Viewer extends Vue {
     else if (json_types.has(suffix))
       this.parse_json_and_add_to_scene(id, data);
 
-    this.ctx.event_bus.$emit("new_object");
-  }
-
+    this.ctx.emit("new_object");
+  },
 
   onclick_grab() {
     this.loading = true;
@@ -326,22 +275,22 @@ export default class Viewer extends Vue {
     }).finally( () => {
       this.loading = false;
     });
-  }
+  },
 
   onclick_up_axis(axis) {
-    this.$store.commit('settings', { camera_up: axis});
+    this.settings =  { ...this.settings, camera_up: axis };
 
-    let camera = this.renderer.camera;
+    let camera = renderer.camera;
     if (axis == 'z')
       camera.up.set(0,0,1);
     else if (axis == 'y')
       camera.up.set(0,1,0);
 
 
-    this.renderer.controls.dispose();
-    this.renderer.setup_controls();
+    renderer.controls.dispose();
+    renderer.setup_controls();
 
-    let scene = this.renderer.scene;
+    let scene = renderer.scene;
     let grid_helper = scene.getObjectByName('GridHelper', true );
     grid_helper.rotateX(-Math.PI/2);
 
@@ -351,10 +300,10 @@ export default class Viewer extends Vue {
     else if (axis == 'y')
       light.position.set(0.1, 1.0, 0.1);
     console.log('axis', axis);
-  }
+  },
 
   raycast() {
-    this.raycaster.setFromCamera( this.renderer.mouse.pos, this.renderer.camera );
+    this.raycaster.setFromCamera( renderer.mouse.pos, renderer.camera );
 
     let intersection = this.raycaster.intersectObject( this.mesh_bbox );
     const color = new THREE.Color("rgb(200, 200, 0)");
@@ -373,14 +322,44 @@ export default class Viewer extends Vue {
       this.mesh_bbox.setColorAt( id_instance, color );
     }
     this.mesh_bbox.instanceColor.needsUpdate = true;
-  }
+  },
 
   advance() {
     requestAnimationFrame(this.advance_ref);
     if (!this.is_active)
       return;
     //this.raycast();
-    this.renderer.advance()
+    renderer.advance()
   }
 }
+
+
+export default {
+  name: "Viewer",
+  components: { MenuPanel, PCAToolbox, AnimationToolbox },
+  computed: {
+    ...mapWritableState(useStore, ['settings'])
+  },
+
+  data() {
+    return {
+      images_src: [],
+      search_text: '',
+      loading: false,
+      is_active: false,
+      mesh_bbox: null,
+      raycaster: new THREE.Raycaster(),
+      id_raycast: -1,
+      toolbox: null,
+      toolbox_props: {},
+    }
+  },
+
+  mounted() {
+    this.init();
+  },
+
+  methods: methods
+};
+
 

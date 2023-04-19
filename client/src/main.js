@@ -1,22 +1,35 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
-import router from '@/router'
-import store from '@/store'
+import router from './router'
+import { Quasar, useQuasar } from 'quasar';
+import quasarUserOptions from './quasar-user-options'
 import io from 'socket.io-client';
 import VueSocketIOExt from 'vue-socket.io-extended';
+import mitt from 'mitt';
 
-import "./quasar"
 
-Vue.config.productionTip = false
+// pinia
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
 
-// -> websocket
-let uri_ws = 'http://localhost:' + process.env.VUE_APP_PORT;
-const ws = io(uri_ws);
-Vue.use(VueSocketIOExt, ws);
-// <-
 
-new Vue({
-  store,
-  router,
-  render: h => h(App),
-}).$mount('#app')
+// websocket
+const url_ws = `http://localhost:${process.env.VUE_APP_PORT}`;
+const socket = io(url_ws);
+
+// app
+const app = createApp(App)
+app.use(Quasar, quasarUserOptions)
+app.use(pinia);
+app.use(router)
+
+// global variables
+//app.provide('socket', socket);
+app.config.globalProperties.$socket = socket;
+app.config.globalProperties.ctx = mitt();
+
+
+app.mount('#app')
+

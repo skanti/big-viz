@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import Stats from "three/examples/jsm/libs/stats.module.js";
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 //import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
@@ -29,7 +29,6 @@ class Renderer {
     this.is_initialized = true;
     this.ctx.renderer = this;
   }
-
 
   setup_scene_renderer() {
     this.win.width = this.root_container.clientWidth;
@@ -70,7 +69,7 @@ class Renderer {
   onmove_mouse(event) {
     this.update_mouse(event);
     this.mouse.is_drag = true;
-    this.ctx.event_bus.$emit("onmove_mouse_" + this.tag, event);
+    this.ctx.emit("onmove_mouse_" + this.tag, event);
   }
 
   update_mouse(event) {
@@ -86,7 +85,7 @@ class Renderer {
 
   onup_mouse(event) {
     if (!this.mouse.is_drag) {
-      this.ctx.event_bus.$emit("onclick_mouse_" + this.tag, event);
+      this.ctx.emit("onclick_mouse_" + this.tag, event);
     }
   }
 
@@ -117,9 +116,9 @@ class Renderer {
   }
 
   advance() {
-   this.controls.update();
+    this.controls.update();
     this.renderer.render(this.scene, this.camera);
-    this.renderer_label.render(this.scene, this.camera);
+    //this.renderer_label.render(this.scene, this.camera);
     this.stats_fps.update();
   }
 
