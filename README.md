@@ -11,7 +11,7 @@
 2. Go to `server` and run `npm install`
 3. In `server` start server with `npm run dev` (this will launch on localhost:9000 by default)
 4. Open a browser and go to `localhost:9000`
-5. If you `ssh` into a server, make sure to pass the port with `ssh xyz.com -R 9000 localhost:9000`
+5. If you `ssh` into a server, make sure to pass the port with `ssh xyz.com -R 9000:localhost:9000`
 
 ## Pics
 
