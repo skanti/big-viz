@@ -237,7 +237,7 @@ const methods = {
         meshes = [meshes];
 
       meshes.forEach(mesh => renderer.upsert_mesh(mesh));
-      this.ctx.emit("new_object");
+      this.ctx.emit("new_object", renderer.scene);
       this.$q.notify({ message: 'Object upserted!', caption: ':)', color: 'green-5' });
     } catch (err){
       console.log(err);
@@ -265,7 +265,7 @@ const methods = {
     else if (json_types.has(suffix))
       this.parse_json_and_add_to_scene(id, data);
 
-    this.ctx.emit("new_object");
+    this.ctx.emit("new_object", renderer.scene);
   },
 
   onclick_grab() {

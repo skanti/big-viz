@@ -46,6 +46,8 @@
 import { mapWritableState } from 'pinia';
 import useStore from '@/store/index.js';
 
+var scene = null;
+
 export default {
   name: 'MenuPanel',
   components: { },
@@ -66,8 +68,8 @@ export default {
   },created () {
     this.ctx.on("new_object", this.add_new_object);
   }, methods : {
-    add_new_object(scene) {
-      this.scene = scene;
+    add_new_object(scene_) {
+      scene = scene_;
       if (scene === null) {
         return null;
       }
@@ -106,12 +108,12 @@ export default {
       this.ctx.emit("selected", { "id": this.id_selected });
     },
     toggle_visibility(e, row) {
-      if (this.scene === null) {
+      if (scene === null) {
         return
       }
       let idx = row.idx;
       row.visible = !row.visible;
-      this.scene.children[idx].visible = !this.scene.children[idx].visible;
+      scene.children[idx].visible = !scene.children[idx].visible;
       e.stopPropagation();
     }
   }
