@@ -50,9 +50,9 @@
             :model-value='settings.camera_up' unelevated dense no-wrap no-caps
             :options="[{label: 'Y-up', value: 'y'}, {label: 'Z-up', value: 'z'} ]"
             @update:model-value="v => onclick_up_axis(v)" />
-            <q-btn-toggle size='sm' color='white' text-color='dark' toggle-color="blue-5"
+            <q-btn-toggle size='sm' color='white' text-color='dark' toggle-color='blue-5'
             :model-value='settings.theme' unelevated dense no-wrap no-caps
-            :options="[{label: 'light', value: 'light'}, {label: 'dark', value: 'dark'} ]"
+            :options="[{value: 'light', icon: 'far fa-sun'}, {value: 'dark', icon: 'fas fa-moon' } ]"
             @update:model-value="v => onclick_theme(v)" />
           </div>
         </div>
