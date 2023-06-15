@@ -50,6 +50,9 @@ const methods = {
     this.onclick_up_axis(this.settings.camera_up);
     this.onclick_theme(this.settings.theme);
 
+    // update listeners (e.g. MenuPanel)
+    this.ctx.emit("new_object", renderer.scene);
+
     // run animation loop
     this.advance_ref = this.advance.bind(this);
     this.advance();

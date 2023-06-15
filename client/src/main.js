@@ -29,6 +29,7 @@ app.use(router)
 //app.provide('socket', socket);
 app.config.globalProperties.$socket = socket;
 app.config.globalProperties.ctx = mitt();
+app.config.globalProperties.cargo = {};
 
 
 app.mount('#app')

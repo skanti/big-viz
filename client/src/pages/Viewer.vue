@@ -58,8 +58,8 @@
         </div>
       </div>
       <div class='col-3'>
-        <MenuPanel ref='menu' class='full-width' :ctx='ctx' style='height:75v'/>
-        <component :is='toolbox' v-bind='toolbox_props' class='full-width' :ctx='ctx'></component>
+        <MenuPanel ref='menu' class='full-width' style='height:75v'/>
+        <component :is='toolbox' v-bind='toolbox_props' class='full-width'></component>
       </div>
     </div>
     <div class='row q-mt-lg q-gutter-sm q-pa-sm' style='max-width:800px'>

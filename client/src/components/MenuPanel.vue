@@ -1,5 +1,5 @@
 <template>
-  <q-table title="Objects" :data="rows" :columns="columns" row-key="id"
+  <q-table title="Objects" :rows="rows" :columns="columns" row-key="id"
     selection="single" :pagination="pagination" @row-click="onclick_row" virtual-scroll
     :rows-per-page-options="[0]" style="max-height:500px">
     <template v-slot:top-left>
@@ -49,9 +49,9 @@ import useStore from '@/store/index.js';
 export default {
   name: 'MenuPanel',
   components: { },
-  props: [ 'ctx' ],
   data() {
     return {
+      rows: [],
       filter: "",
       id_selected: "",
       columns: [
@@ -63,14 +63,17 @@ export default {
         rowsPerPage: 0
       },
     }
-  }, computed: {
-    ...mapWritableState(useStore, ['scene']),
-    rows: function() {
-      if (this.scene === null) {
+  },created () {
+    this.ctx.on("new_object", this.add_new_object);
+  }, methods : {
+    add_new_object(scene) {
+      this.scene = scene;
+      if (scene === null) {
         return null;
       }
 
-      const children = this.scene.children;
+      // check if scene has children
+      const children = scene.children;
       if (children === undefined || children.length == 0) {
         return [];
       }
@@ -81,33 +84,31 @@ export default {
         let type = obj.type;
         if (type.includes("Light"))
           continue
-        if (name_mapping[type] == undefined)
-          name_mapping[type] = 0
-        else
-          name_mapping[type] = name_mapping[type] + 1;
+            if (name_mapping[type] == undefined)
+              name_mapping[type] = 0
+            else
+              name_mapping[type] = name_mapping[type] + 1;
         let name = obj.type + name_mapping[type];
         if (obj.name)
           name = obj.name;
         let item = { idx: i, id: name, type: obj.type, visible: obj.visible };
         rows.push(item);
       }
-      return rows;
+      this.rows = rows;
     },
-  }, created () {
-    this.ctx.on("new_object", this.add_new_object);
-  }, methods : {
-    add_new_object: function () {
-    },
-    onclick_row:  function(row) {
+    onclick_row(row) {
       // eslint-disable-next-line
       const id = row.id;
       if (this.id_selected == id)
         this.id_selected = "";
-      else 
+      else
         this.id_selected = id;
-      this.ctx.event_bus.$emit("selected", { "id": this.id_selected });
+      this.ctx.emit("selected", { "id": this.id_selected });
     },
-    toggle_visibility: function(e, row) {
+    toggle_visibility(e, row) {
+      if (this.scene === null) {
+        return
+      }
       let idx = row.idx;
       row.visible = !row.visible;
       this.scene.children[idx].visible = !this.scene.children[idx].visible;
