@@ -27,7 +27,7 @@ const methods = {
     this.loading = true;
 
     // init renderer
-    renderer = new Renderer(this.ctx, this.$refs.div_scene, "renderer");
+    renderer = new Renderer(this.ctx, this.settings, this.$refs.div_scene, "renderer");
     renderer.camera.position.set(5,5,2);
     renderer.controls.target.set(0,0,0);
     renderer.controls.update();
@@ -48,6 +48,7 @@ const methods = {
     this.is_active = true;
 
     this.onclick_up_axis(this.settings.camera_up);
+    this.onclick_theme(this.settings.theme);
 
     // run animation loop
     this.advance_ref = this.advance.bind(this);
@@ -300,6 +301,11 @@ const methods = {
     else if (axis == 'y')
       light.position.set(0.1, 1.0, 0.1);
     console.log('axis', axis);
+  },
+
+  onclick_theme(theme) {
+    this.settings =  { ...this.settings, theme: theme };
+    renderer.set_background(theme);
   },
 
   raycast() {

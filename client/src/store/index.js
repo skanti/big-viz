@@ -4,7 +4,8 @@ export default defineStore('general', {
   state: () => ({
     scene: null,
     settings: {
-      camera_up: 'z'
+      camera_up: 'z',
+      theme: 'light'
     }
   }),
   getters: {

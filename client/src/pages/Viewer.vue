@@ -44,10 +44,16 @@
     <div class='row q-col-gutter-sm q-pa-sm'>
       <div class='col-9'>
         <div ref='div_scene' style='position: relative; width:100%;height:75vh'>
-          <div class='absolute q-pa-xs q-gutter-xs' style='top: 0px'>
+          <div class='absolute q-pa-xs q-gutter-xs' style='top: 0px; z-index: 999'>
             <q-btn size='sm' label='3D World' color='primary' text-color='white' icon='fas fa-cube' square dense unelevated />
-            <q-btn-toggle size='sm' class='absolute' color='white' text-color='dark' toggle-color="blue-5" :value='settings.camera_up' unelevated dense no-wrap no-caps
-              :options="[{label: 'Y-up', value: 'y'}, {label: 'Z-up', value: 'z'} ]" @input="v => onclick_up_axis(v)" />
+            <q-btn-toggle size='sm' color='white' text-color='dark' toggle-color="blue-5"
+            :model-value='settings.camera_up' unelevated dense no-wrap no-caps
+            :options="[{label: 'Y-up', value: 'y'}, {label: 'Z-up', value: 'z'} ]"
+            @update:model-value="v => onclick_up_axis(v)" />
+            <q-btn-toggle size='sm' color='white' text-color='dark' toggle-color="blue-5"
+            :model-value='settings.theme' unelevated dense no-wrap no-caps
+            :options="[{label: 'light', value: 'light'}, {label: 'dark', value: 'dark'} ]"
+            @update:model-value="v => onclick_theme(v)" />
           </div>
         </div>
       </div>

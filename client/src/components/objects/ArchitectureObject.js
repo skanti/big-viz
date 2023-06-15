@@ -66,7 +66,10 @@ class ArchitectureObject {
         cube.setRotationFromQuaternion(rot);
         group.add(cube);
       } else if (cmd == 'make_door' || cmd == 'make_window') {
-        const wall = lookup[params.wall_id];
+        const wall = lookup[params.wall_id] || lookup[params.wall0_id] || lookup[params.wall1_id];
+        if (!wall) {
+          continue
+        }
         const angle = wall.angle;
         const pos = new THREE.Vector3(params.position_x, params.position_y, params.position_z);
         const rot = (new THREE.Quaternion()).setFromAxisAngle(new THREE.Vector3( 0, 0, 1 ), angle);

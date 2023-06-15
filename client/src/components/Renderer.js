@@ -5,9 +5,10 @@ import { CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 //import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
 class Renderer {
-  constructor(ctx, div_root, tag) {
+  constructor(ctx, settings, div_root, tag) {
     // -> variable definition
     this.ctx = ctx;
+    this.settings = settings;
     this.tag = tag;
     this.root_container = div_root;
 
@@ -27,7 +28,7 @@ class Renderer {
     this.setup_controls();
     // <-
     this.is_initialized = true;
-    this.ctx.renderer = this;
+    //this.ctx.renderer = this;
   }
 
   setup_scene_renderer() {
@@ -42,12 +43,12 @@ class Renderer {
     this.scene.add(this.axes_helper);
 
     // set lighting
-    this.scene.add( new THREE.AmbientLight( 0x555555 ) );
+    this.scene.add( new THREE.AmbientLight( 0xffffff ) );
     let light = new THREE.DirectionalLight( 0xffffff, 0.5 );
     light.name = "Light";
     light.position.set(0.1,0.1,1);
-    this.scene.add( light );
-    this.scene.background = new THREE.Color("rgb(240, 230, 230)");
+    this.scene.add(light);
+    this.set_background(this.settings.theme);
 
     this.renderer.setPixelRatio( window.devicePixelRatio );
     this.renderer.setSize(this.win.width, this.win.height);
@@ -64,6 +65,16 @@ class Renderer {
     this.stats_fps.domElement.style.cssText = 'position:relative;top:0px;left:0px;';
     this.root_container.appendChild( this.stats_fps.dom );
     // <-
+  }
+
+  set_background(theme) {
+    if (theme === "light") {
+      this.scene.background = new THREE.Color("rgb(240, 230, 230)");
+    } else if (theme === "dark") {
+      this.scene.background = new THREE.Color("rgb(10, 10, 10)");
+    } else {
+      this.scene.background = new THREE.Color("rgb(240, 230, 230)");
+    }
   }
 
   onmove_mouse(event) {
