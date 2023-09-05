@@ -118,7 +118,12 @@ const methods = {
       console.log("copy failed");
     })
   },
-
+  click_copy_to_clipboard(e, text) {
+    copyToClipboard(text).then(() => {
+      this.$q.notify({ message: 'Copied!', caption: text, icon: 'fas fa-check-circle', color: 'green-5', timeout: '200' });
+    });
+    e.stopPropagation();
+  },
   add_ground_plane_to_scene() {
     let width = 100.0;
 
@@ -226,8 +231,8 @@ const methods = {
     // check if image
     if (data['type'] == 'image') {
       //document.getElementById('img_div').src = data["data"];
-      this.images_src.push(data['data']);
-      this.$q.notify({ message: 'Image upserted!', caption: ':)', color: 'green-5' });
+      this.images_src.push({ id: data.id, src: data.data });
+      this.$q.notify({ message: 'Image upserted!', caption: ':)', color: 'green-5', timeout: '200' });
       return;
     }
     // else check for 3D data
@@ -238,7 +243,7 @@ const methods = {
 
       meshes.forEach(mesh => renderer.upsert_mesh(mesh));
       this.ctx.emit("new_object", renderer.scene);
-      this.$q.notify({ message: 'Object upserted!', caption: ':)', color: 'green-5' });
+      this.$q.notify({ message: 'Object upserted!', caption: ':)', color: 'green-5', timeout: '200' });
     } catch (err){
       console.log(err);
     }

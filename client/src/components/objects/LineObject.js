@@ -54,6 +54,10 @@ class LineObject {
     if ("colors" in data) {
       this.colors = data.colors.flat();
     }
+
+    if ("width" in data) {
+      this.width = data.width;
+    }
   }
 
   make(data) {

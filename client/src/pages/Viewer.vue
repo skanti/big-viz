@@ -63,8 +63,10 @@
       </div>
     </div>
     <div class='row q-mt-lg q-gutter-sm q-pa-sm' style='max-width:800px'>
-      <div v-for='(img_src,i) in images_src' :key='"img_div" + i'>
-        <img :src='img_src' />
+      <div v-for='(img,i) in images_src' :key='"img_div" + i'>
+      <div class="q-pa-none cursor-pointer" style="font-size: 0.8em"
+      @click="e => click_copy_to_clipboard(e, img.id)"> {{img.id }} </div>
+        <img :src='img.src' :alt="img.id"/>
       </div>
     </div>
 
