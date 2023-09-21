@@ -1,13 +1,22 @@
 <template>
-  <q-table title="Objects" :rows="rows" :columns="columns" row-key="id"
+
+  <q-table class="q-my-xs" title="Objects" :rows="rows" :columns="columns" row-key="id"
     selection="single" :pagination="pagination" @row-click="onclick_row" virtual-scroll
-    :rows-per-page-options="[0]" style="max-height:500px">
-    <template v-slot:top-left>
-      <q-input borderless dense debounce="300" v-model="filter" placeholder="Search">
-        <template v-slot:prepend>
-          <q-icon name="fas fa-search" />
-        </template>
-      </q-input>
+    :rows-per-page-options="[0]" style="max-height:600px">
+    <template v-slot:top>
+      <div style="width:100%">
+        <q-input outlined dense debounce="300" v-model="filter" placeholder="Search" style="width:100%">
+          <template v-slot:prepend>
+            <q-icon name="fas fa-search" />
+          </template>
+        </q-input>
+        <br/>
+
+        <!-- tool bar -->
+        <q-btn @click='click_hide_all_objects' label='Hide all' color='dark' icon-right='fas fa-eye'
+          size="sm" no-caps dense outline />
+        <!-- tool bar -->
+      </div>
     </template>
 
 
@@ -114,7 +123,19 @@ export default {
       let idx = row.idx;
       row.visible = !row.visible;
       scene.children[idx].visible = !scene.children[idx].visible;
-      e.stopPropagation();
+    },
+    click_hide_all_objects() {
+      if (scene === null) {
+        return
+      }
+      const children_special = ["Helper", "Child", "Light"];
+      for (const child of scene.children) {
+        const is_special = children_special.some(x => child.type.includes(x))
+        if (is_special) {
+          continue
+        }
+        child.visible = false;
+      }
     }
   }
 }

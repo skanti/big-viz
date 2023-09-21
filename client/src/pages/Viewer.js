@@ -308,7 +308,6 @@ const methods = {
       light.position.set(0.1, 0.1, 1);
     else if (axis == 'y')
       light.position.set(0.1, 1.0, 0.1);
-    console.log('axis', axis);
   },
 
   onclick_theme(theme) {

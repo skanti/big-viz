@@ -1,8 +1,12 @@
 import * as THREE from "three";
 
 import MathHelpers from '@/components/MathHelpers.js';
+import { Line2 } from 'three/examples/jsm/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 
-class PlyObject {
+
+class WireframeObject {
   ctx = null;
   renderer = null;
 
@@ -10,7 +14,7 @@ class PlyObject {
   type = "";
   vertices = [];
   edges = [];
-  res = 0.0;
+  width = 0.01;
 
   trs = null;
   color = null;
@@ -34,14 +38,19 @@ class PlyObject {
     }
     // <-
 
-    this.id = data["id"];
-    this.type = data["type"];
-    this.vertices = data["vertices"].flat();
-    this.edges = data["edges"].flat();
+    this.id = data.id;
+    this.type = data.dtype;
+    this.vertices = data.vertices;
+    this.edges = data.edges;
 
     if ("trs" in data) {
-      this.trs = data["trs"];
+      this.trs = data.trs;
     }
+
+    if ("width" in data ) {
+      this.width = data.width;
+    }
+
 
     if ("color" in data) {
       let c = data["color"];
@@ -61,25 +70,32 @@ class PlyObject {
 
   create_mesh() {
     const color = this.color;
-    this.geometry = new THREE.BufferGeometry();
 
-    this.geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( this.vertices, 3 ) );
+    const group = new THREE.Group();
+    const mat = new LineMaterial({ color: this.color, linewidth: this.width });
+    for (const edge of this.edges) {
+      const p0 = this.vertices[edge[0]];
+      const p1 = this.vertices[edge[1]];
+      const verts = [p0, p1].flat();
 
-    this.material = new THREE.MeshStandardMaterial(
-      { color: color, wireframe: true }
-    );
+      // const geo = new THREE.BufferGeometry();
+      // geo.setAttribute( 'position', new THREE.Float32BufferAttribute( verts, 3 ) );
+      // const line = new THREE.Line(geo, mat);
+      const geo = new LineGeometry();
+      geo.setPositions(verts)
+      const line = new Line2(geo, mat);
+      line.computeLineDistances();
+      group.add(line);
+    }
 
-    this.mesh = new THREE.Mesh( this.geometry, this.material );
-
+    group.name = this.id;
+    this.mesh = group;
     this.mesh.raw = this;
     this.mesh.name = this.id;
+    return this.mesh;
 
-    let mat = MathHelpers.compose_mat4(this.trs);
-    this.mesh.matrixAutoUpdate = false;
-    this.mesh.matrix.copy(mat);
-    this.mesh.updateMatrixWorld(true);
   }
 
 }
 
-export default PlyObject;
+export default WireframeObject;

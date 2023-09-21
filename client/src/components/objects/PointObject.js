@@ -36,30 +36,30 @@ class PointObject {
     }
     // <-
 
-    this.id = data["id"];
-    this.type = data["type"];
-    this.positions = data["positions"];
-    this.res = data["res"];
+    this.id = data.id;
+    this.type = data.type;
+    this.positions = data.positions;
+    this.res = data.res;
 
     if ("trs" in data) {
-      this.trs = data["trs"];
+      this.trs = data.trs;
     }
 
     if ("color" in data) {
-      let c = data["color"];
+      let c = data.color
       if (c.length != 3)
         throw Error("'color' field must have size=3");
       this.color = new THREE.Color(c[0], c[1], c[2]);
     } else if ("colors" in data) {
-      this.colors = data["colors"];
+      this.colors = data.colors
     }
 
     if ("transparent" in data) {
-      this.transparent = data["transparent"];
+      this.transparent = data.transparent
     }
 
     if ("badge" in data) {
-      this.badge = data["badge"];
+      this.badge = data.badge
     }
   }
 
@@ -71,7 +71,7 @@ class PointObject {
   create_mesh() {
     const res = this.res;
     const color = this.color;
-    this.geometry = new THREE.BoxBufferGeometry(res, res, res);
+    this.geometry = new THREE.BoxGeometry(res, res, res);
     const opacity = this.transparent ? 0.3 : 1.0;
     this.material = new THREE.MeshStandardMaterial( { color: color, opacity: opacity, transparent: this.transparent });
 

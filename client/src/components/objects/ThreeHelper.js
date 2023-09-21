@@ -8,6 +8,7 @@ import PointObject from '@/components/objects/PointObject.js';
 import LabelObject from '@/components/objects/LabelObject.js';
 import ArchitectureObject from '@/components/objects/ArchitectureObject.js';
 import PlyObject from '@/components/objects/PlyObject.js';
+import WireframeObject from '@/components/objects/WireframeObject.js';
 import CamObject from '@/components/objects/CamObject.js';
 import ArrowObject from '@/components/objects/ArrowObject.js';
 import LineObject from '@/components/objects/LineObject.js';
@@ -23,6 +24,12 @@ function make_verts_and_faces_mesh(ctx, data) {
 
 function make_points_mesh(ctx, data) {
   const obj = new PointObject(ctx);
+  obj.make(data);
+  return obj.mesh;
+}
+
+function make_wireframe_mesh(ctx, data) {
+  const obj = new WireframeObject(ctx);
   obj.make(data);
   return obj.mesh;
 }
@@ -179,7 +186,7 @@ function make_group_mesh(ctx, data) {
 function make_mesh_from_type(ctx, data) {
   let type = data["type"];
   let accepted_types = new Set(["animation_motion", "animation_visibility",
-    "architecture", "group", "ply", "points", "line", "label", "box", "pca_grid", "camera", "arrow"]);
+    "architecture", "group", "ply", "points", "line", "wireframe", "label", "box", "pca_grid", "camera", "arrow"]);
   if (!accepted_types.has(type)) {
     console.log("Warning: Received data has unknown type. Type: ", type);
     return
@@ -193,6 +200,8 @@ function make_mesh_from_type(ctx, data) {
     return make_line_mesh(ctx, data);
   else if (type === "label")
     return make_label_mesh(ctx, data);
+  else if (type === "wireframe")
+    return make_wireframe_mesh(ctx, data);
   else if (type === "camera")
     return make_camera_mesh(ctx, data);
   else if (type === "arrow")
