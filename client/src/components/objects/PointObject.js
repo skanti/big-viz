@@ -54,13 +54,9 @@ class PointObject {
       this.colors = data.colors
     }
 
-    if ("transparent" in data) {
-      this.transparent = data.transparent
-    }
+    this.transparent = data.transparent || this.transparent;
 
-    if ("badge" in data) {
-      this.badge = data.badge
-    }
+    this.badge = data.badge || this.badge;
   }
 
   make(data) {

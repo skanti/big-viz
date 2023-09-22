@@ -25,6 +25,10 @@ const compose_mat4 = function(trs) {
       rot = new THREE.Quaternion(q[1], q[2], q[3], q[0]).normalize();
     }
 
+    if ("r" in trs) {
+      throw Error("Rotation 'r' in 'trs' not accepted.");
+    }
+
     if ("s" in trs) {
       let s = trs["s"];
       if (s.length != 3)
