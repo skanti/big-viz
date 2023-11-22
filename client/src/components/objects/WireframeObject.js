@@ -12,7 +12,7 @@ class WireframeObject {
 
   id = "";
   type = "";
-  vertices = [];
+  points = [];
   edges = [];
   width = 0.01;
 
@@ -31,7 +31,7 @@ class WireframeObject {
 
   extract(data) {
     // -> check if keys present
-    let keys_required = ["id", "type", "vertices", "edges"];
+    let keys_required = ["id", "type", "points", "edges"];
     for (let k of keys_required) {
       if (!(k in data))
         throw Error(k + " not in data json");
@@ -40,7 +40,7 @@ class WireframeObject {
 
     this.id = data.id;
     this.type = data.dtype;
-    this.vertices = data.vertices;
+    this.points = data.points;
     this.edges = data.edges;
 
     if ("trs" in data) {
@@ -73,9 +73,10 @@ class WireframeObject {
 
     const group = new THREE.Group();
     const mat = new LineMaterial({ color: this.color, linewidth: this.width });
+    console.log(this.edges);
     for (const edge of this.edges) {
-      const p0 = this.vertices[edge[0]];
-      const p1 = this.vertices[edge[1]];
+      const p0 = this.points[edge[0]];
+      const p1 = this.points[edge[1]];
       const verts = [p0, p1].flat();
 
       // const geo = new THREE.BufferGeometry();

@@ -68,6 +68,9 @@
       @click="e => click_copy_to_clipboard(e, img.id)"> {{img.id }} </div>
         <img :src='img.src' :alt="img.id"/>
       </div>
+      <div v-for='(vid,i) in videos_src' :key='"video_div" + i'>
+        <video :src='vid.src' :alt="vid.id"  type="video/mp4" controls/>
+      </div>
     </div>
 
   </q-page>

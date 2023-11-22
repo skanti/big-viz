@@ -14,7 +14,7 @@ class PointObject {
 
   trs = null;
   color = null;
-  colors = null;
+  colors = [];
   badge = "";
   transparent = false;
 
@@ -47,6 +47,7 @@ class PointObject {
 
     if ("color" in data) {
       let c = data.color
+      console.log(c);
       if (c.length != 3)
         throw Error("'color' field must have size=3");
       this.color = new THREE.Color(c[0], c[1], c[2]);
@@ -67,35 +68,46 @@ class PointObject {
   create_mesh() {
     const res = this.res;
     const color = this.color;
-    this.geometry = new THREE.BoxGeometry(res, res, res);
+
+    const use_vertex_colors = this.colors.length > 0
+    const mat = new THREE.PointsMaterial( { size: res, color: color, vertexColors: use_vertex_colors });
     const opacity = this.transparent ? 0.3 : 1.0;
-    this.material = new THREE.MeshStandardMaterial( { color: color, opacity: opacity, transparent: this.transparent });
 
-    const positions = this.positions;
-    const colors = this.colors;
-    const n_positions = positions.length;
+    const positions = this.positions.flat();
+    const colors = this.colors.flat();
+    const positions_num = positions.length;
 
-    let mat = MathHelpers.compose_mat4(this.trs);
-
-    this.mesh = new THREE.InstancedMesh( this.geometry, this.material, n_positions );
-    for (let i = 0; i < n_positions; i++) {
-      let t = new THREE.Vector4(positions[i][0], positions[i][1], positions[i][2], 1);
-      t = t.applyMatrix4(mat);
-
-      let trs = (new THREE.Matrix4()).makeTranslation(t.x, t.y, t.z);
-      this.mesh.setMatrixAt(i, trs);
-      if (colors) {
-        const c = new THREE.Color(colors[i][0], colors[i][1], colors[i][2]);
-        this.mesh.setColorAt(i, c);
-      }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute( 'position', new THREE.Float32BufferAttribute(positions, 3));
+    if (colors) {
+      geo.setAttribute( 'color', new THREE.Float32BufferAttribute(colors, 3));
     }
+    geo.computeBoundingSphere();
+    this.mesh = new THREE.Points(geo, mat );
+
+
+    // let mat = MathHelpers.compose_mat4(this.trs);
+    // for (let i = 0; i < positions_num; i++) {
+    //   let t = new THREE.Vector4(positions[i][0], positions[i][1], positions[i][2], 1);
+    //   t = t.applyMatrix4(mat);
+    //
+    //   let trs = (new THREE.Matrix4()).makeTranslation(t.x, t.y, t.z);
+    //   this.mesh.setMatrixAt(i, trs);
+    //   if (colors) {
+    //     const c = new THREE.Color(colors[i][0], colors[i][1], colors[i][2]);
+    //     this.mesh.setColorAt(i, c);
+    //   }
+    // }
+    // this.mesh = new THREE.InstancedMesh( this.geometry, this.material, positions_num );
+
+
     this.mesh.raw = this;
     this.mesh.name = this.id;
 
-    let t = new THREE.Vector3();
-    let q = new THREE.Quaternion();
-    let s = new THREE.Vector3();
-    mat.decompose(t,q,s);
+    let trs = MathHelpers.compose_mat4(this.trs);
+    this.mesh.matrixAutoUpdate = false;
+    this.mesh.matrix.copy(trs);
+    this.mesh.updateMatrixWorld(true);
 
     const badge = this.badge;
     if (badge) {

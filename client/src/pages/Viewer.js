@@ -229,9 +229,15 @@ const methods = {
     this.toolbox = "";
     data = JSON.parse(data);
     // check if image
-    if (data['type'] == 'image') {
+    if (data.type === 'image') {
       //document.getElementById('img_div').src = data["data"];
       this.images_src.push({ id: data.id, src: data.data });
+      this.$q.notify({ message: 'Image upserted!', caption: ':)', color: 'green-5', timeout: '200' });
+      return;
+    } else if (data.type === 'video') {
+      console.log(data);
+      //document.getElementById('img_div').src = data["data"];
+      this.videos_src.push({ id: data.id, src: data.data });
       this.$q.notify({ message: 'Image upserted!', caption: ':)', color: 'green-5', timeout: '200' });
       return;
     }
@@ -357,6 +363,7 @@ export default {
   data() {
     return {
       images_src: [],
+      videos_src: [],
       search_text: '',
       loading: false,
       is_active: false,
