@@ -25,8 +25,8 @@ class AnimationMotion {
     this.frames = data["frames"];
 
     let evt = "play_" + this.id;
-    this.ctx.event_bus.$off(evt);
-    this.ctx.event_bus.$on(evt, this.play.bind(this));
+    this.ctx.off(evt);
+    this.ctx.on(evt, this.play.bind(this));
   }
 
   make(data) {
@@ -34,20 +34,22 @@ class AnimationMotion {
   }
 
   async play(params) {
+    const scene = params.scene
     let delay = params["delay"];
+
 
     let frames_num = this.frames.length;
     const timer = ms => new Promise(res => setTimeout(res, ms))
 
     for (let i = 0; i < frames_num; i++) {
       for (let update of this.frames[i]) {
-        ThreeHelper.find_and_make_update(this.ctx, update);
+        ThreeHelper.find_and_make_update(scene, update);
       }
       await timer(delay);
     }
 
     for (let reset of this.frames[0]) {
-      ThreeHelper.find_and_make_update(this.ctx, reset);
+      ThreeHelper.find_and_make_update(scene, reset);
     }
 
 

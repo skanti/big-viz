@@ -199,6 +199,7 @@ const methods = {
 
   on_new_animation(params) {
     this.toolbox = AnimationToolbox;
+    params["mitt"] = this.ctx;
     params["scene"] = renderer.scene;
     this.toolbox_props = params;
   },

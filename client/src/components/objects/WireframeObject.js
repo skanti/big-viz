@@ -78,6 +78,7 @@ class WireframeObject {
       const p0 = this.points[edge[0]];
       const p1 = this.points[edge[1]];
       const verts = [p0, p1].flat();
+      console.log(verts);
 
       // const geo = new THREE.BufferGeometry();
       // geo.setAttribute( 'position', new THREE.Float32BufferAttribute( verts, 3 ) );

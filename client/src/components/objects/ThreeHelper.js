@@ -75,23 +75,23 @@ function make_animation_motion(ctx, data) {
   }
   let obj = new AnimationMotion(ctx);
   obj.make(data);
-  ctx.event_bus.$emit("new_animation", data)
+  ctx.emit("new_animation", data)
   return meshes;
 }
 
 function make_animation_visibility(ctx, data) {
   let obj = new AnimationVisibility(ctx);
   obj.make(data);
-  ctx.event_bus.$emit("new_animation", data)
+  ctx.emit("new_animation", data)
   return [];
 }
 
-function find_and_make_update(ctx, update) {
+function find_and_make_update(scene, update) {
   let { id } = update;
   if (!id)
     throw Error("Id not defined");
 
-  let mesh = ctx.renderer.scene.getObjectByName(id, true );
+  let mesh = scene.getObjectByName(id, true );
   if (!mesh) {
     console.log("No mesh found with id: " + id);
     return
@@ -180,6 +180,14 @@ function make_group_mesh(ctx, data) {
       visible = data["visible"];
     }
   group.visible = visible;
+
+  if ("trs" in data) {
+    const mat = MathHelpers.compose_mat4(data.trs);
+    group.matrixAutoUpdate = false;
+    group.matrix.copy(mat);
+    group.updateMatrixWorld(true);
+  }
+
   return group;
 }
 
