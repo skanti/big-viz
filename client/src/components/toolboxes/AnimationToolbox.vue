@@ -34,7 +34,7 @@ export default {
   props: [ 'mitt', 'id', 'delay', 'scene' ],
   data() {
     return {
-      delay_: 10,
+      delay_: 30,
     };
   },
   created () {

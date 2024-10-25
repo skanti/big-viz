@@ -3,21 +3,19 @@ import * as THREE from "three";
 import MathHelpers from '@/components/MathHelpers.js';
 
 class CamObject {
-  ctx = null;
-  renderer = null;
-
-  id = "";
-  type = "";
-  size = 1;
-
-  trs = null;
-
-  camera = null;
-  mesh = null;
 
   constructor(ctx) {
     this.ctx = ctx;
-    //this.ctx.event_bus.$on("pca", this.on_change_parameters.bind(this));
+
+    this.id = "";
+    this.type = "";
+    this.size = 1;
+    this.aspect_ratio = 4.0/3.0; // width/height
+
+    this.trs = null;
+
+    this.camera = null;
+    this.mesh = null;
   }
 
   extract(data) {
@@ -29,16 +27,21 @@ class CamObject {
     }
     // <-
 
-    this.id = data["id"];
-    this.type = data["type"];
-    this.size = data["size"];
+    this.id = data.id;
+    this.type = data.type;
+    this.size = data.size;
 
     if ("size" in data) {
-      this.size = data["size"];
+      this.size = data.size;
     }
 
+    if ("aspect_ratio" in data) {
+      this.aspect_ratio = data.aspect_ratio;
+    }
+    console.log(data);
+
     if ("trs" in data) {
-      this.trs = data["trs"];
+      this.trs = data.trs;
     }
 
   }
@@ -50,7 +53,7 @@ class CamObject {
 
   create_mesh() {
 
-    this.camera = new THREE.PerspectiveCamera( 75, 4.0/3.0, this.size*0.5, this.size );
+    this.camera = new THREE.PerspectiveCamera( 75, this.aspect_ratio, this.size*0.5, this.size );
     this.mesh = new THREE.CameraHelper( this.camera );
 
     this.mesh.raw = this;

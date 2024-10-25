@@ -1,36 +1,33 @@
 import ThreeHelper from '@/components/objects/ThreeHelper.js';
 
 class AnimationMotion {
-  ctx = null;
-
-  type = "";
-
-  frames = null;
-
   constructor(ctx) {
     this.ctx = ctx;
+    this.id = '';
+    this.type = '';
+    this.frames = null;
+    this.keep_first = true;
   }
 
-  extract(data) {
+  make(data) {
     // -> check if keys present
     let keys_required = ["id", "type", "frames"];
     for (let k of keys_required) {
       if (!(k in data))
         throw Error(k + " not in data json");
     }
-    // <-
 
-    this.id = data["id"];
-    this.type = data["type"];
-    this.frames = data["frames"];
+    this.id = data.id;
+    this.type = data.type;
+    this.frames = data.frames;
+    if ("keep_first" in data) {
+      this.keep_first = data.keep_first;
+    }
 
     let evt = "play_" + this.id;
     this.ctx.off(evt);
     this.ctx.on(evt, this.play.bind(this));
-  }
 
-  make(data) {
-    this.extract(data);
   }
 
   async play(params) {

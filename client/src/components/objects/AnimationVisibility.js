@@ -5,11 +5,13 @@ class AnimationVisibility {
     this.id = '';
     this.type = '';
     this.frames = null;
+    this.keep_last = false;
   }
 
   make(data) {
-    this.id = data['id'];
-    this.frames = data['frames'];
+    this.id = data.id;
+    this.frames = data.frames;
+    this.keep_last = data.keep_last;
 
     let evt = "play_" + this.id;
     this.ctx.off(evt);
@@ -50,11 +52,15 @@ class AnimationVisibility {
 
       // wait
       await timer(delay);
-      // meshes[i].visible = false;
+      meshes[i].visible = false;
 
     }
 
-    meshes[0].visible = true;
+    if (this.keep_last ) {
+      meshes.at(-1).visible = true;
+    } else {
+      meshes[0].visible = true;
+    }
 
   }
 
