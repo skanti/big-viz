@@ -7,6 +7,7 @@ class AnimationMotion {
     this.type = '';
     this.frames = null;
     this.keep_first = true;
+    this.delay = 20;
   }
 
   make(data) {
@@ -23,11 +24,13 @@ class AnimationMotion {
     if ("keep_first" in data) {
       this.keep_first = data.keep_first;
     }
+    if ("delay" in data) {
+      this.delay = data.delay;
+    }
 
     let evt = "play_" + this.id;
-    this.ctx.off(evt);
+    this.ctx.off(evt, { delay: this.delay });
     this.ctx.on(evt, this.play.bind(this));
-
   }
 
   async play(params) {

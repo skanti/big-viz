@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as THREE from "three";
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
-import { copyToClipboard } from 'quasar'
+import { useQuasar, copyToClipboard } from 'quasar'
 
 import MenuPanel from '@/components/MenuPanel.vue';
 import PCAToolbox from '@/components/toolboxes/PCAToolbox.vue';
@@ -375,7 +375,13 @@ export default {
       toolbox_props: {},
     }
   },
-
+  setup() {
+    const q = useQuasar();
+    return { q$: q }
+  },
+  created() {
+    this.q$.dark.set(true)
+  },
   mounted() {
     this.init();
   },

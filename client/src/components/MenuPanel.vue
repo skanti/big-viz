@@ -31,7 +31,7 @@
 
     <template v-slot:body="props">
       <q-tr class="cursor-pointer"
-        :class="props.row.id ==  id_selected ? 'bg-primary' : 'bg-grey-1'"
+        :class="props.row.id ==  id_selected ? 'bg-primary' : 'bg-transparent'"
         :props="props" @click="onclick_row(props.row)">
         <q-td auto-width>
           <q-btn size="sm"

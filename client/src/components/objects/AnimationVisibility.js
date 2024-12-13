@@ -6,12 +6,19 @@ class AnimationVisibility {
     this.type = '';
     this.frames = null;
     this.keep_last = false;
+    this.delay = 20;
   }
 
   make(data) {
     this.id = data.id;
     this.frames = data.frames;
     this.keep_last = data.keep_last;
+
+    if ("delay" in data) {
+      this.delay = data.delay;
+    }
+
+    console.log(this.delay);
 
     let evt = "play_" + this.id;
     this.ctx.off(evt);
