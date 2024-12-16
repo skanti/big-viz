@@ -39,6 +39,9 @@
         </div>
       </div>
     </div>
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn @click='onclick_clear_canvas' label='Clear Canvas' class='text-bold' color='red-5' icon-right='fas fa-times' dense />
+    </q-page-sticky>
     <!-- status -->
 
     <div class='row q-col-gutter-sm q-pa-sm'>

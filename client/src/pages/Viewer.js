@@ -68,6 +68,8 @@ const methods = {
   },
 
   onclick_clear_canvas() {
+    // clear images
+    this.images_src = [];
     const children = renderer.scene.children;
     if (children === undefined || children.length == 0)
       return;
