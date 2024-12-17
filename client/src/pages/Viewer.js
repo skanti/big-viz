@@ -44,6 +44,8 @@ const methods = {
     this.$socket.on('user', id_socket => console.log("id_socket", id_socket));
     this.$socket.on('upsert', this.on_ws_upsert.bind(this));
     this.$socket.on('update', this.on_ws_update.bind(this));
+    // keyboard listener
+    document.addEventListener('keydown', this.on_key_down);
 
     this.is_active = true;
 
@@ -60,9 +62,17 @@ const methods = {
     setTimeout(() => {
       this.loading = false;
     }, 2000);
-
   },
+  on_key_down(evt) {
+      switch (evt.target && evt.target.tagName) {
+        case 'INPUT': case 'SELECT': case 'TEXTAREA': return;
+      }
 
+      // navigation keys
+      if (evt.key === 'c') {
+        this.onclick_clear_canvas();
+      }
+  },
   onclick_clear_cache() {
     localStorage.clear();
   },
