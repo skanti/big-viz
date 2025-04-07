@@ -70,15 +70,15 @@ class WireframeObject {
 
   create_mesh() {
     const color = this.color;
+    console.log("edges", this.edges);
+    console.log("points", this.points);
 
     const group = new THREE.Group();
     const mat = new LineMaterial({ color: this.color, linewidth: this.width });
-    console.log(this.edges);
     for (const edge of this.edges) {
       const p0 = this.points[edge[0]];
       const p1 = this.points[edge[1]];
       const verts = [p0, p1].flat();
-      console.log(verts);
 
       // const geo = new THREE.BufferGeometry();
       // geo.setAttribute( 'position', new THREE.Float32BufferAttribute( verts, 3 ) );

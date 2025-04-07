@@ -67,13 +67,14 @@
     </div>
     <div class='row q-mt-lg q-gutter-sm q-pa-sm' style='max-width:800px'>
       <div v-for='(img,i) in images_src' :key='"img_div" + i'>
-      <q-btn size="sm"
-      :label="img.id" @click="e => click_copy_to_clipboard(e, img.id)"
-      dense flat no-caps/>
+        <q-btn size="sm" :label="img.id" @click="e => click_copy_to_clipboard(e, img.id)" dense flat no-caps/>
+        <br/>
         <img :src='img.src' :alt="img.id"/>
       </div>
       <div v-for='(vid,i) in videos_src' :key='"video_div" + i'>
-        <video :src='vid.src' :alt="vid.id"  type="video/mp4" controls/>
+        <q-btn size="sm" :label="vid.id" @click="e => click_copy_to_clipboard(e, vid.id)" dense flat no-caps/>
+        <br/>
+        <video :src='vid.src' :alt="vid.id"  :type="'video/' + vid.format" controls/>
       </div>
     </div>
 

@@ -80,6 +80,7 @@ const methods = {
   onclick_clear_canvas() {
     // clear images
     this.images_src = [];
+    this.videos_src = [];
     const children = renderer.scene.children;
     if (children === undefined || children.length == 0)
       return;
@@ -248,7 +249,6 @@ const methods = {
       this.$q.notify({ message: 'Image upserted!', caption: ':)', color: 'green-5', timeout: '200' });
       return;
     } else if (data.type === 'video') {
-      console.log(data);
       //document.getElementById('img_div').src = data["data"];
       this.videos_src.push({ id: data.id, src: data.data });
       this.$q.notify({ message: 'Image upserted!', caption: ':)', color: 'green-5', timeout: '200' });
