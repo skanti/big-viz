@@ -27,13 +27,6 @@ app.use(bodyParser.json());
 app.use(cors());
 // <-
 
-// -> vue
-const middleware_static = express.static('../client/dist');
-app.use(middleware_static);
-app.use(history({ }));
-app.use(middleware_static);
-// <-
-
 // -> auth middlelayer (if required)
 function authenticate_jwt(req, res, next) {
   const access_token = req.headers["x-access-token"];
@@ -50,13 +43,9 @@ function authenticate_jwt(req, res, next) {
 // <-
 
 
-// -> some extra services
-router.get('/', function(req, res, next) {
-  res.send('alive');
-});
-
 router.get('/timestamp', function(req, res, next) {
   const timestamp = (new Date()).toString();
+  console.log("here");
   res.send(timestamp);
 });
 
@@ -82,6 +71,12 @@ router.get('/data/*', function(req, res, next) {
 
 app.use('/', router);
 module.exports = router;
+
+// -> vue
+const middleware_static = express.static('../client/dist');
+app.use(history({ }));
+app.use(middleware_static);
+// <-
 
 const hostname = process.env.SERVER_HOSTNAME;
 const port = process.env.SERVER_PORT;
